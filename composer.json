@@ -1,6 +1,6 @@
 {
     "name": "bpaulin/setup-ez-content-type-bundle",
-    "description": "a bundle to create ezpublish content types from symfony config"
+    "description": "a bundle to create ezpublish content types from symfony config",
     "authors": [
         {
             "name": "Bruno Paulin",
