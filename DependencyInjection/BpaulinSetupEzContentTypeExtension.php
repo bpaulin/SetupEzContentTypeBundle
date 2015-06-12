@@ -24,6 +24,6 @@ class BpaulinSetupEzContentTypeExtension extends Extension
         $container->setParameter( 'bpaulin_setup_ez_content_type.groups', $config['groups'] );
 
         $loader = new Loader\YamlFileLoader( $container, new FileLocator( __DIR__.'/../Resources/config' ) );
-//        $loader->load('services.yml');
+        $loader->load( 'services.yml' );
     }
 }

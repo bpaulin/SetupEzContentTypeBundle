@@ -6,7 +6,7 @@
  * Time: 21:56
  */
 
-namespace Bpaulin\SetupEzContentType\Tests\DependencyInjection;
+namespace Bpaulin\SetupEzContentTypeBundle\Tests\DependencyInjection;
 
 use Bpaulin\SetupEzContentTypeBundle\DependencyInjection\BpaulinSetupEzContentTypeExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,6 +32,18 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->container = new ContainerBuilder();
         $this->container->registerExtension( $this->extension );
+    }
+
+    public function testTreeProcessorServiceIsAvailable()
+    {
+        $this->container->loadFromExtension( $this->extension->getAlias() );
+        $this->container->compile();
+
+        $this->assertTrue( $this->container->has( 'bpaulin.setupezcontenttype.treeprocessor' ) );
+        $this->assertEquals(
+            get_class( $this->container->get( 'bpaulin.setupezcontenttype.treeprocessor' ) ),
+            'Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor'
+        );
     }
 
     public function testWithoutConfiguration()

@@ -1,0 +1,5 @@
+services:
+    bpaulin.setupezcontenttype.treeprocessor:
+        class: Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor
+        calls:
+            - [ setContainer,[ @service_container ] ]
