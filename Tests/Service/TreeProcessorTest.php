@@ -61,7 +61,7 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( $expected, $method->invokeArgs( $processor, array( &$typeParam, $extends ) ) );
     }
 
-    public function ProcessGroupProvider()
+    public function processGroupProvider()
     {
         return array(
             array(
@@ -122,7 +122,7 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider ProcessGroupProvider
+     * @dataProvider processGroupProvider
      */
     public function testProcessGroup( $config, $expected )
     {
