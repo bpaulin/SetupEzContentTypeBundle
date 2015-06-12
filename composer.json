@@ -1,0 +1,25 @@
+{
+    "name": "bpaulin/setup-ez-content-type-bundle",
+    "description": "a bundle to create ezpublish content types from symfony config"
+    "authors": [
+        {
+            "name": "Bruno Paulin",
+            "email": "brunopaulin@bpaulin.net"
+        }
+    ],
+    "config": {
+        "bin-dir": "bin"
+    },
+    "autoload": {
+        "psr-4": { "Bpaulin\\SetupEzContentTypeBundle\\" : "" }
+    },
+    "require": {
+        "ezsystems/ezpublish-kernel": "v2014.11.8"
+    },
+    "require-dev": {
+        "ezsystems/ezcs": "dev-master",
+        "squizlabs/php_codesniffer": "^2.3",
+        "phing/phing": "^2.11",
+        "phpunit/phpunit": "^4.7"
+    }
+}

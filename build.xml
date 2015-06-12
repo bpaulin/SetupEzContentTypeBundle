@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="puzzle" default="ci">
+
+    <target name="ci" depends="phpunit,phpcs"/>
+
+    <target name="phpunit">
+        <exec executable="./bin/phpunit" passthru="true" checkreturn="true">
+        </exec>
+    </target>
+
+    <target name="phpcs">
+        <exec executable="./bin/phpcs" passthru="true" checkreturn="true">
+            <arg value="-p"/>
+            <arg value="--standard=vendor/ezsystems/ezcs/php/ezcs/ruleset.xml"/>
+            <arg value="--ignore=vendor,bin"/>
+            <arg path="."/>
+        </exec>
+    </target>
+</project>

@@ -1,0 +1,47 @@
+bpaulin_setup_ez_content_type:
+    groups:
+        group1:
+            bpaulin_min:
+                extends: group2.bpaulin_virtual
+                mainLanguageCode: 'eng-min'
+                names:
+                    eng-GB: 'My content min'
+            bpaulin_all:
+                mainLanguageCode: 'eng-all'
+                nameSchema: '<name>'
+                names:
+                    eng-GB: 'My content all'
+                descriptions:
+                    eng-GB: 'My content type'
+                fields:
+                    name:
+                        type: 'ezstring'
+                        names:
+                            eng-GB: 'My content type'
+                        descriptions:
+                            eng-GB: 'My content type'
+                        fieldgroup: content
+                        position: 10
+                        translatable: true
+                        required: true
+                        searchable: true
+                    body:
+                        type: 'ezstring'
+                        position: 10
+        group2:
+            bpaulin_virtual:
+#                extends: group1.bpaulin_all
+                mainLanguageCode: 'eng-virtual'
+                virtual: true
+                descriptions:
+                    eng-GB: 'My content virtual'
+                fields:
+                    name:
+                        type: 'ezstring'
+                        position: 10
+        group3:
+            bpaulin_another:
+                extends: group1.bpaulin_min
+                mainLanguageCode: 'eng-another'
+                descriptions:
+                    eng-GB: 'My content virtual'
