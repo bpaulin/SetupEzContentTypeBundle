@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->arrayNode( 'groups' )
+                    ->isRequired()
                     ->prototype( 'array' ) // content type group
                         ->prototype( 'array' ) // content type
                             ->children()
