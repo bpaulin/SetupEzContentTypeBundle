@@ -39,10 +39,28 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->container->loadFromExtension( $this->extension->getAlias() );
         $this->container->compile();
 
-        $this->assertTrue( $this->container->has( 'bpaulin.setupezcontenttype.treeprocessor' ) );
+        $this->assertTrue(
+            $this->container->has( 'bpaulin.setupezcontenttype.treeprocessor' ),
+            "The treeprocessor service isn't available"
+        );
         $this->assertEquals(
             get_class( $this->container->get( 'bpaulin.setupezcontenttype.treeprocessor' ) ),
             'Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor'
+        );
+    }
+
+    public function testImportServiceIsAvailable()
+    {
+        $this->container->loadFromExtension( $this->extension->getAlias() );
+        $this->container->compile();
+
+        $this->assertTrue(
+            $this->container->has( 'bpaulin.setupezcontenttype.import' ),
+            "The import service isn't available"
+        );
+        $this->assertEquals(
+            get_class( $this->container->get( 'bpaulin.setupezcontenttype.import' ) ),
+            'Bpaulin\SetupEzContentTypeBundle\Service\Import'
         );
     }
 

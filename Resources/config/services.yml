@@ -3,3 +3,8 @@ services:
         class: Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor
         calls:
             - [ setContainer,[ @service_container ] ]
+
+    bpaulin.setupezcontenttype.import:
+        class: Bpaulin\SetupEzContentTypeBundle\Service\Import
+        calls:
+            - [ setContainer,[ @service_container ] ]
