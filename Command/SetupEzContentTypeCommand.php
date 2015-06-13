@@ -86,14 +86,45 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             $output->writeln( '<info>Altering content types...</info>' );
         }
 
+        /*
+         * call services
+         */
         $tree = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' )->getTree();
         $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
+        $repository = $this->getContainer()->get( 'ezpublish.api.repository' );
 
-        $returnCode = $importService->process(
-            $tree,
-            $input->getOption( 'force' )
-        );
+        /*
+         * set user admin
+         */
+        $userService = $repository->getUserService();
+        $repository->setCurrentUser( $userService->loadUserByLogin( 'admin' ) );
 
-        return $returnCode;
+        /*
+         * and finally, at least, do something
+         */
+        $importService->setForce( $input->getOption( 'force' ) );
+        foreach ( $tree as $groupName => $groupData )
+        {
+            $groupDraft = $importService->getGroupDraft( $groupName );
+            foreach ( $groupData as $typeName => $typeData )
+            {
+                $typeDraft = $importService->getTypeDraft( $typeName );
+                $importService->hydrateType( $typeDraft, $typeData );
+
+                foreach ( $typeData['fields'] as $fieldName => $fieldData )
+                {
+                    $fieldDraft = $importService->getFieldDraft(
+                        $fieldName,
+                        $fieldData['type']
+                    );
+                    $importService->hydrateField( $fieldDraft, $fieldData );
+                    $importService->addFieldToType(
+                        $fieldDraft,
+                        $typeDraft
+                    );
+                }
+                $importService->addTypeToGroup( $typeDraft, $groupDraft );
+            }
+        }
     }
 }

@@ -2,9 +2,11 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Tests\Command;
 
+use eZ\Publish\Core\Repository\UserService;
 use Symfony\Component\Console\Application;
 use Bpaulin\SetupEzContentTypeBundle\Command\SetupEzContentTypeCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+use eZ\Publish\Core\Repository\Values\User\User;
 
 class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -95,10 +97,11 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
     {
         $tree = array(
             "group1" => array(
-                "field1" => array()
+                "type1" => array(
+                    "fields" => array()
+                )
             )
         );
-        $return = 255;
 
         $treeProcessor = $this->getMockBuilder( 'Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor' )
             ->getMock();
@@ -111,29 +114,49 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
         $import = $this->getMockBuilder( 'Bpaulin\SetupEzContentTypeBundle\Service\Import' )
             ->getMock();
         $import->expects( $this->once() )
-            ->method( 'process' )
+            ->method( 'setForce' )
             ->with(
-                $tree,
                 $called
-            )
+            );
+
+        $userAdmin = new User();
+        $userService = $this->getMockBuilder( 'eZ\Publish\API\Repository\UserService' )
+            ->getMock();
+        $userService->expects( $this->once() )
+            ->method( 'loadUserByLogin' )
+            ->with( 'admin' )
             ->will(
                 $this->returnValue(
-                    $return
+                    $userAdmin
                 )
             );
+        $repository = $this->getMockBuilder( 'eZ\Publish\API\Repository\Repository' )
+            ->getMock();
+        $repository->expects( $this->once() )
+            ->method( 'getUserService' )
+            ->will(
+                $this->returnValue(
+                    $userService
+                )
+            );
+        $repository->expects( $this->once() )
+            ->method( 'setCurrentUser' )
+            ->with( $userAdmin );
 
         $container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
-        $container->expects( $this->exactly( 2 ) )
+        $container->expects( $this->exactly( 3 ) )
             ->method( 'get' )
             ->withConsecutive(
                 array( 'bpaulin.setupezcontenttype.treeprocessor' ),
-                array( 'bpaulin.setupezcontenttype.import' )
+                array( 'bpaulin.setupezcontenttype.import' ),
+                array( 'ezpublish.api.repository' )
             )
             ->will(
                 $this->onConsecutiveCalls(
                     $treeProcessor,
-                    $import
+                    $import,
+                    $repository
                 )
             );
         $this->command->setContainer( $container );
@@ -147,10 +170,6 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertContains(
             $display,
             $this->tester->getDisplay()
-        );
-        $this->assertEquals(
-            $return,
-            $this->tester->getStatusCode()
         );
     }
 }
