@@ -1,6 +1,6 @@
 <?php
 
-namespace Bpaulin\SetupEzContentTypeBundle\Test\Service;
+namespace Bpaulin\SetupEzContentTypeBundle\Tests\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor;
 
