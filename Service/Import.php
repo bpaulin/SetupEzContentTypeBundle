@@ -14,4 +14,14 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  */
 class Import extends ContainerAware
 {
+    /**
+     * @param $data
+     * @param $force
+     *
+     * @return integer
+     */
+    public function process( $data, $force )
+    {
+
+    }
 }

@@ -86,6 +86,14 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             $output->writeln( '<info>Altering content types...</info>' );
         }
 
-        return 0;
+        $tree = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' )->getTree();
+        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
+
+        $returnCode = $importService->process(
+            $tree,
+            $input->getOption( 'force' )
+        );
+
+        return $returnCode;
     }
 }

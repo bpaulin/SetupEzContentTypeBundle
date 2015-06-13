@@ -72,33 +72,85 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testCommandWithDryRun()
+    public function commandProvider()
     {
-        $this->tester->execute(
+        return array(
             array(
-                'command' => $this->command->getName(),
-                '--dry-run' => true
+                '--dry-run',
+                false,
+                'Only displaying what would be done...'
+            ),
+            array(
+                '--force',
+                true,
+                'Altering content types...'
             )
-        );
-
-        $this->assertContains(
-            'Only displaying what would be done...',
-            $this->tester->getDisplay()
         );
     }
 
-    public function testCommandWithForce()
+    /**
+     * @dataProvider commandProvider
+     */
+    public function testCommandWithDryRunOrForce( $param, $called, $display)
     {
+        $tree = array(
+            "group1" => array(
+                "field1" => array()
+            )
+        );
+        $return = 255;
+
+        $treeProcessor = $this->getMockBuilder( 'Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor' )
+            ->getMock();
+        $treeProcessor->expects( $this->once() )
+            ->method( 'getTree' )
+            ->will(
+                $this->returnValue( $tree )
+            );
+
+        $import = $this->getMockBuilder( 'Bpaulin\SetupEzContentTypeBundle\Service\Import' )
+            ->getMock();
+        $import->expects( $this->once() )
+            ->method( 'process' )
+            ->with(
+                $tree,
+                $called
+            )
+            ->will(
+                $this->returnValue(
+                    $return
+                )
+            );
+
+        $container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
+            ->getMock();
+        $container->expects( $this->exactly( 2 ) )
+            ->method( 'get' )
+            ->withConsecutive(
+                array( 'bpaulin.setupezcontenttype.treeprocessor' ),
+                array( 'bpaulin.setupezcontenttype.import' )
+            )
+            ->will(
+                $this->onConsecutiveCalls(
+                    $treeProcessor,
+                    $import
+                )
+            );
+        $this->command->setContainer( $container );
         $this->tester->execute(
             array(
                 'command' => $this->command->getName(),
-                '--force' => true
+                $param => true
             )
         );
 
         $this->assertContains(
-            'Altering content types...',
+            $display,
             $this->tester->getDisplay()
+        );
+        $this->assertEquals(
+            $return,
+            $this->tester->getStatusCode()
         );
     }
 }
