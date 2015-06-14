@@ -2,6 +2,8 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Tests\Service;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
+use Bpaulin\SetupEzContentTypeBundle\Events;
 use Bpaulin\SetupEzContentTypeBundle\Service\Import;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct;
 use eZ\Publish\Core\Repository\Values\ContentType\ContentTypeGroup;
@@ -30,7 +32,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
     protected $contentTypeService;
 
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     * @var \PHPUnit_Framework_MockObject_MockObjecter
      */
     protected $dispatcher;
 
@@ -80,6 +82,13 @@ class ImportTest extends \PHPUnit_Framework_TestCase
                     new \eZ\Publish\Core\Base\Exceptions\NotFoundException( '', '' )
                 )
             );
+        $event = new GroupLoadingEvent();
+        $event->setGroupName( 'sdf' );
+        $event->setStatus( Events::STATUS_MISSING );
+
+        $this->dispatcher->expects( $this->once() )
+            ->method( 'dispatch' )
+            ->with( Events::AFTER_GROUP_LOADING, $event );
 
         $this->assertEquals(
             false,
@@ -113,6 +122,15 @@ class ImportTest extends \PHPUnit_Framework_TestCase
                 $this->returnValue( $sdfGroup )
             );
 
+        $event = new GroupLoadingEvent();
+        $event->setGroupName( 'sdf' );
+        $event->setStatus( Events::STATUS_CREATED );
+        $event->setGroup( $sdfGroup );
+
+        $this->dispatcher->expects( $this->once() )
+            ->method( 'dispatch' )
+            ->with( Events::AFTER_GROUP_LOADING, $event );
+
         $this->import->setForce( true );
         $this->assertEquals(
             $sdfGroup,
@@ -122,6 +140,15 @@ class ImportTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOldGroup()
     {
+        $event = new GroupLoadingEvent();
+        $event->setGroupName( 'sdf' );
+        $event->setStatus( Events::STATUS_LOADED );
+        $event->setGroup( 'sdfGroup' );
+
+        $this->dispatcher->expects( $this->once() )
+            ->method( 'dispatch' )
+            ->with( Events::AFTER_GROUP_LOADING, $event );
+
         $this->contentTypeService->expects( $this->once() )
             ->method( 'loadContentTypeGroupByIdentifier' )
             ->with( 'sdf' )

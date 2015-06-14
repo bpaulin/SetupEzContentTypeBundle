@@ -28,6 +28,11 @@ class Import extends ContainerAware
      */
     protected $contentTypeService;
 
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    protected $eventDispatcher;
+
     protected function getContentTypeService()
     {
         if ( !$this->contentTypeService )
@@ -35,6 +40,15 @@ class Import extends ContainerAware
             $this->contentTypeService = $this->container->get( 'ezpublish.api.repository' )->getContentTypeService();
         }
         return $this->contentTypeService;
+    }
+
+    protected function getEventDispatcher()
+    {
+        if ( !$this->eventDispatcher )
+        {
+            $this->eventDispatcher = $this->container->get( 'event_dispatcher' );
+        }
+        return $this->eventDispatcher;
     }
 
     public function setForce( $force )
@@ -71,7 +85,7 @@ class Import extends ContainerAware
         }
         $event->setGroup( $contentTypeGroup );
 
-        $this->container->get( "event_dispatcher" )->dispatch(
+        $this->getEventDispatcher()->dispatch(
             Events::AFTER_GROUP_LOADING, $event
         );
         return $contentTypeGroup;

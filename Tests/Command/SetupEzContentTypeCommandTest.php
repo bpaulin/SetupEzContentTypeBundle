@@ -7,6 +7,7 @@ use Symfony\Component\Console\Application;
 use Bpaulin\SetupEzContentTypeBundle\Command\SetupEzContentTypeCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use eZ\Publish\Core\Repository\Values\User\User;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -145,6 +146,9 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = $this->getMockBuilder( '\Symfony\Component\EventDispatcher\EventDispatcher' )
             ->getMock();
+        $dispatcher->expects( $this->once() )
+            ->method( 'addSubscriber' )
+            ->with( $this->command );
 
         $container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
