@@ -1,10 +1,13 @@
 <?php
 namespace Bpaulin\SetupEzContentTypeBundle\Command;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
+use Bpaulin\SetupEzContentTypeBundle\Events;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class SetupEzContentTypeCommand
@@ -15,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author bpaulin<brunopaulin@bpaulin.net>
  */
 class SetupEzContentTypeCommand extends ContainerAwareCommand
+    implements EventSubscriberInterface
 {
     /**
      * @var \Symfony\Component\Console\Output\ConsoleOutput
@@ -99,6 +103,10 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         $userService = $repository->getUserService();
         $repository->setCurrentUser( $userService->loadUserByLogin( 'admin' ) );
 
+        /** @var \Symfony\Component\EventDispatcher\EventDispatcher $dispatcher */
+        $dispatcher = $this->getContainer()->get( "event_dispatcher" );
+        $dispatcher->addSubscriber( $this );
+
         /*
          * and finally, at least, do something
          */
@@ -126,5 +134,27 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
                 $importService->addTypeToGroup( $typeDraft, $groupDraft );
             }
         }
+    }
+
+    /**
+     * return events this command is listening to
+     *
+     * @return array
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            Events::AFTER_GROUP_LOADING => 'afterGroupLoading'
+        );
+    }
+
+    /**
+     * This is executed after a group is loaded
+     *
+     * @param GroupLoadingEvent $event
+     */
+    public function afterGroupLoading(GroupLoadingEvent $event)
+    {
+        $this->output->writeln( $event->getGroupName().' '.$event->getStatus() );
     }
 }

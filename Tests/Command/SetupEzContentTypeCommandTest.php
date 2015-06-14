@@ -143,20 +143,25 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
             ->method( 'setCurrentUser' )
             ->with( $userAdmin );
 
+        $dispatcher = $this->getMockBuilder( '\Symfony\Component\EventDispatcher\EventDispatcher' )
+            ->getMock();
+
         $container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
-        $container->expects( $this->exactly( 3 ) )
+        $container->expects( $this->exactly( 4 ) )
             ->method( 'get' )
             ->withConsecutive(
                 array( 'bpaulin.setupezcontenttype.treeprocessor' ),
                 array( 'bpaulin.setupezcontenttype.import' ),
-                array( 'ezpublish.api.repository' )
+                array( 'ezpublish.api.repository' ),
+                array( 'event_dispatcher' )
             )
             ->will(
                 $this->onConsecutiveCalls(
                     $treeProcessor,
                     $import,
-                    $repository
+                    $repository,
+                    $dispatcher
                 )
             );
         $this->command->setContainer( $container );

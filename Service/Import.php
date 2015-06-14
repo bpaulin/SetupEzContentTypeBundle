@@ -2,7 +2,10 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
+use Bpaulin\SetupEzContentTypeBundle\Events;
 use eZ\Publish\Core\REST\Client\ContentTypeService;
+use eZ\Publish\SPI\Persistence\Content\Type\Group;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
@@ -46,10 +49,15 @@ class Import extends ContainerAware
 
     public function getGroupDraft( $groupName )
     {
+        $event = new GroupLoadingEvent();
+        $event->setGroupName( $groupName )
+            ->setStatus( Events::STATUS_MISSING );
+
         $contentTypeGroup = false;
         try
         {
             $contentTypeGroup = $this->getContentTypeService()->loadContentTypeGroupByIdentifier( $groupName );
+            $event->setStatus( Events::STATUS_LOADED );
         }
         catch (\eZ\Publish\API\Repository\Exceptions\NotFoundException $e)
         {
@@ -58,8 +66,14 @@ class Import extends ContainerAware
                 $contentTypeGroup = $this->getContentTypeService()->createContentTypeGroup(
                     $this->getContentTypeService()->newContentTypeGroupCreateStruct( $groupName )
                 );
+                $event->setStatus( Events::STATUS_CREATED );
             }
         }
+        $event->setGroup( $contentTypeGroup );
+
+        $this->container->get( "event_dispatcher" )->dispatch(
+            Events::AFTER_GROUP_LOADING, $event
+        );
         return $contentTypeGroup;
     }
 

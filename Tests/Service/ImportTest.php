@@ -29,6 +29,11 @@ class ImportTest extends \PHPUnit_Framework_TestCase
      */
     protected $contentTypeService;
 
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    protected $dispatcher;
+
     public function setUp()
     {
         $this->contentTypeService = $this->getMockBuilder( 'eZ\Publish\API\Repository\ContentTypeService' )
@@ -44,14 +49,21 @@ class ImportTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $this->dispatcher = $this->getMockBuilder( '\Symfony\Component\EventDispatcher\EventDispatcher' )
+            ->getMock();
+
         $this->container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
-        $this->container->expects( $this->once() )
+        $this->container->expects( $this->exactly( 2 ) )
             ->method( 'get' )
-            ->with( 'ezpublish.api.repository' )
+            ->withConsecutive(
+                array( 'ezpublish.api.repository' ),
+                array( 'event_dispatcher' )
+            )
             ->will(
-                $this->returnValue(
-                    $this->repository
+                $this->onConsecutiveCalls(
+                    $this->repository,
+                    $this->dispatcher
                 )
             );
 
