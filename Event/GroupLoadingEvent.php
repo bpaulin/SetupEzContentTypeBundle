@@ -3,11 +3,10 @@ namespace Bpaulin\SetupEzContentTypeBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class GroupLoadingEvent extends Event
+class GroupLoadingEvent extends AbstractEvent
 {
     protected $groupName = null;
     protected $group = null;
-    protected $status = null;
 
     /**
      * @return null
@@ -23,23 +22,6 @@ class GroupLoadingEvent extends Event
     public function setGroup($group)
     {
         $this->group = $group;
-        return $this;
-    }
-
-    /**
-     * @return null
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param null $status
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
         return $this;
     }
 

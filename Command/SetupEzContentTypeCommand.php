@@ -1,7 +1,11 @@
 <?php
 namespace Bpaulin\SetupEzContentTypeBundle\Command;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -117,21 +121,25 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             foreach ( $groupData as $typeName => $typeData )
             {
                 $typeDraft = $importService->getTypeDraft( $typeName );
-                $importService->hydrateType( $typeDraft, $typeData );
+                $typeStructure = $importService->getTypeStructure( $typeDraft, $typeName );
+                $importService->hydrateType( $typeStructure, $typeData );
 
                 foreach ( $typeData['fields'] as $fieldName => $fieldData )
                 {
                     $fieldDraft = $importService->getFieldDraft(
                         $fieldName,
-                        $fieldData['type']
-                    );
-                    $importService->hydrateField( $fieldDraft, $fieldData );
-                    $importService->addFieldToType(
-                        $fieldDraft,
                         $typeDraft
                     );
+                    $fieldStructure = $importService->getFieldStructure( $fieldDraft, $fieldName, $fieldData['type'] );
+                    $importService->hydrateField( $fieldStructure, $fieldData );
+                    $importService->addFieldToType(
+                        $fieldDraft,
+                        $fieldStructure,
+                        $typeDraft,
+                        $typeStructure
+                    );
                 }
-                $importService->addTypeToGroup( $typeDraft, $groupDraft );
+                $importService->addTypeToGroup( $typeDraft, $typeStructure, $groupDraft );
             }
         }
     }
@@ -144,7 +152,11 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     public static function getSubscribedEvents()
     {
         return array(
-            Events::AFTER_GROUP_LOADING => 'afterGroupLoading'
+            Events::AFTER_GROUP_LOADING => 'afterGroupLoading',
+            Events::AFTER_TYPE_DRAFT_LOADING => 'afterTypeDraftLoading',
+            Events::AFTER_FIELD_DRAFT_LOADING => 'afterFieldDraftLoading',
+            Events::AFTER_TYPE_STRUCTURE_LOADING => 'afterTypeStructureLoading',
+            Events::AFTER_FIELD_STRUCTURE_LOADING => 'afterFieldStructureLoading',
         );
     }
 
@@ -155,6 +167,26 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
      */
     public function afterGroupLoading(GroupLoadingEvent $event)
     {
-        $this->output->writeln( $event->getGroupName().' '.$event->getStatus() );
+        $this->output->writeln( 'group '.$event->getGroupName().' '.$event->getStatus() );
+    }
+
+    public function afterTypeDraftLoading(TypeDraftEvent $event)
+    {
+        $this->output->writeln( '  type draft '.$event->getTypeName().' '.$event->getStatus() );
+    }
+
+    public function afterFieldDraftLoading(FieldDraftEvent $event)
+    {
+        $this->output->writeln( '    field draft '.$event->getFieldName().' '.$event->getStatus() );
+    }
+
+    public function afterTypeStructureLoading(TypeStructureEvent $event)
+    {
+        $this->output->writeln( '  type structure: '.$event->getStatus() );
+    }
+
+    public function afterFieldStructureLoading(FieldStructureEvent $event)
+    {
+        $this->output->writeln( '    field structure: '.$event->getStatus() );
     }
 }

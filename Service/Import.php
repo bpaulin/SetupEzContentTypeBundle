@@ -2,7 +2,11 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use eZ\Publish\Core\REST\Client\ContentTypeService;
 use eZ\Publish\SPI\Persistence\Content\Type\Group;
@@ -33,6 +37,9 @@ class Import extends ContainerAware
      */
     protected $eventDispatcher;
 
+    /**
+     * @return \eZ\Publish\API\Repository\ContentTypeService
+     */
     protected function getContentTypeService()
     {
         if ( !$this->contentTypeService )
@@ -42,6 +49,9 @@ class Import extends ContainerAware
         return $this->contentTypeService;
     }
 
+    /**
+     * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher|\Symfony\Component\EventDispatcher\EventDispatcher
+     */
     protected function getEventDispatcher()
     {
         if ( !$this->eventDispatcher )
@@ -51,11 +61,19 @@ class Import extends ContainerAware
         return $this->eventDispatcher;
     }
 
+    /**
+     * @param $force
+     * @return $this
+     */
     public function setForce( $force )
     {
         $this->force = $force;
+        return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function getForce()
     {
         return $this->force;
@@ -91,34 +109,206 @@ class Import extends ContainerAware
         return $contentTypeGroup;
     }
 
-    public function getTypeDraft($typeName)
+    public function getTypeDraft ($typeName )
     {
-        return false;
+        $event = new TypeDraftEvent();
+        $event->setTypeName( $typeName )
+            ->setStatus( Events::STATUS_MISSING );
+        try
+        {
+            $contentType = $this->getContentTypeService()->loadContentTypeByIdentifier( $typeName );
+            try
+            {
+                $contentType = $this->getContentTypeService()->createContentTypeDraft( $contentType );
+                $event->setStatus( Events::STATUS_CREATED );
+            }
+            catch (\eZ\Publish\Core\Base\Exceptions\BadStateException $e)
+            {
+                $contentType = $this->getContentTypeService()->loadContentTypeDraft( $contentType->id );
+                $event->setStatus( Events::STATUS_LOADED );
+            }
+        }
+        catch (\eZ\Publish\API\Repository\Exceptions\NotFoundException $e)
+        {
+            $contentType = false;
+        }
+        $event->setTypeDraft( $contentType );
+
+        $this->getEventDispatcher()->dispatch(
+            Events::AFTER_TYPE_DRAFT_LOADING, $event
+        );
+        return $contentType;
     }
 
-    public function hydrateType($typeDraft, $typeData)
+    public function getTypeStructure( $typeDraft, $typeName )
     {
-        return false;
+        $event = new TypeStructureEvent();
+        if ( $typeDraft )
+        {
+            $structure = $this->getContentTypeService()->newContentTypeUpdateStruct();
+            $event->setStatus( Events::STATUS_UPDATE_STRUCTURE );
+        }
+        else
+        {
+            $structure = $this->getContentTypeService()->newContentTypeCreateStruct( $typeName );
+            $event->setStatus( Events::STATUS_CREATE_STRUCTURE );
+        }
+        $event->setTypeStructure( $structure );
+
+        $this->getEventDispatcher()->dispatch(
+            Events::AFTER_TYPE_STRUCTURE_LOADING, $event
+        );
+        return $structure;
     }
 
-    public function getFieldDraft($fieldName)
+    public function hydrateType($typeStructure, $typeData)
     {
-        return false;
+        // type data
+        $typeStructure->mainLanguageCode = str_replace( '_', '-', $typeData['mainLanguageCode'] );
+        $names = array();
+        foreach ( $typeData['names'] as $key => $value )
+        {
+            $names[str_replace( '_', '-', $key )] = $value;
+        }
+        $typeStructure->names = $names;
+
+        if ( isset( $typeData['nameSchema'] ) )
+        {
+            $typeStructure->nameSchema = $typeData['nameSchema'];
+        }
+        if ( isset( $typeData['descriptions'] ) )
+        {
+            $descriptions = array();
+            foreach ( $typeData['descriptions'] as $key => $value )
+            {
+                $descriptions[str_replace( '_', '-', $key )] = $value;
+            }
+            $typeStructure->descriptions = $descriptions;
+        }
     }
 
-    public function hydrateField($fieldDraft, $fieldData)
+    /**
+     * @param $fieldName
+     * @param $fieldType
+     * @param $typeDraft \eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
+     * @return mixed
+     */
+    public function getFieldDraft($fieldName, $typeDraft)
     {
-        return false;
+        $event = new FieldDraftEvent();
+        $event->setFieldName( $fieldName );
+
+        $fieldDraft = null;
+        $event->setStatus( Events::STATUS_MISSING );
+        if ( $typeDraft )
+        {
+            $fieldDraft = $typeDraft->getFieldDefinition( $fieldName );
+            $event->setStatus( Events::STATUS_LOADED );
+        }
+
+        $event->setFieldDraft( $fieldDraft );
+
+        $this->getEventDispatcher()->dispatch(
+            Events::AFTER_FIELD_DRAFT_LOADING, $event
+        );
+
+        return $fieldDraft;
     }
 
-    public function addFieldToType($fieldDraft, $typeDraft)
+    public function getFieldStructure( $fieldDraft, $fieldName, $fieldType )
     {
-        return false;
+        $event = new FieldStructureEvent();
+        if ( $fieldDraft )
+        {
+            $structure = $this->getContentTypeService()->newFieldDefinitionUpdateStruct();
+            $event->setStatus( Events::STATUS_UPDATE_STRUCTURE );
+        }
+        else
+        {
+            $structure = $this->getContentTypeService()->newFieldDefinitionCreateStruct( $fieldName, $fieldType );
+            $event->setFieldStructure( Events::STATUS_CREATE_STRUCTURE );
+        }
+        $event->setFieldStructure( $structure );
+
+        $this->getEventDispatcher()->dispatch(
+            Events::AFTER_FIELD_STRUCTURE_LOADING, $event
+        );
+
+        return $structure;
     }
 
-    public function addTypeToGroup($typeDraft, $groupDraft)
+    public function hydrateField($fieldStructure, $fieldData)
     {
-        return false;
+        $fieldStructure->position = $fieldData['position'];
+
+        if ( isset( $fieldData['translatable'] ) )
+        {
+            $fieldStructure->isTranslatable = $fieldData['translatable'];
+        }
+        if ( isset( $fieldData['required'] ) )
+        {
+            $fieldStructure->isRequired = $fieldData['required'];
+        }
+        if ( isset( $fieldData['searchable'] ) )
+        {
+            $fieldStructure->isSearchable = $fieldData['searchable'];
+        }
+        if ( isset( $fieldData['fieldgroup'] ) )
+        {
+            $fieldStructure->fieldGroup = $fieldData['fieldgroup'];
+        }
+        if ( isset( $fieldData['names'] ) )
+        {
+            $names = array();
+            foreach ( $fieldData['names'] as $key => $value )
+            {
+                $names[str_replace( '_', '-', $key )] = $value;
+            }
+            $fieldStructure->names = $names;
+        }
+        if ( isset( $fieldData['descriptions'] ) )
+        {
+            $descriptions = array();
+            foreach ( $fieldData['descriptions'] as $key => $value )
+            {
+                $descriptions[str_replace( '_', '-', $key )] = $value;
+            }
+            $fieldStructure->descriptions = $descriptions;
+        }
     }
+
+    public function addFieldToType($fieldDraft, $fieldStructure, $typeDraft, $typeStructure)
+    {
+        if ( $typeDraft )
+        {
+            $this->getContentTypeService()->updateFieldDefinition(
+                $typeDraft,
+                $typeDraft->getFieldDefinition( $fieldDraft->identifier ),
+                $fieldStructure
+            );
+        }
+        else
+        {
+            $typeStructure->addFieldDefinition( $fieldStructure );
+        }
+    }
+
+    public function addTypeToGroup( $typeDraft, $typeStructure, $groupDraft )
+    {
+        if ( $typeDraft )
+        {
+            $this->getContentTypeService()->updateContentTypeDraft( $typeDraft, $typeStructure );
+            $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
+        }
+        else
+        {
+            $typeDraft = $this->getContentTypeService()->createContentType(
+                $typeStructure,
+                array( $groupDraft )
+            );
+            $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
+        }
+    }
+
 }
 
