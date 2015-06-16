@@ -1,40 +1,43 @@
+
 bpaulin_setup_ez_content_type:
     groups:
         group1:
             bpaulin_min:
                 extends: group2.bpaulin_virtual
-                mainLanguageCode: 'eng-min'
+                mainLanguageCode: 'eng-GB'
                 names:
-                    eng-GB: 'My content min'
+                    eng-GB: 'bpaulin_min'
             bpaulin_all:
-                mainLanguageCode: 'eng-all'
+                mainLanguageCode: 'eng-GB'
                 nameSchema: '<name>'
                 names:
-                    eng-GB: 'My content all'
+                    eng-GB: 'bpaulin_alll'
+                    eng-GB: 'bpaulin_all'
                 descriptions:
-                    eng-GB: 'My content type'
+                    eng-GB: 'bpaulin_all'
                 fields:
                     name:
                         type: 'ezstring'
                         names:
-                            eng-GB: 'My content type'
+                            eng-GB: 'bpaulin_all'
                         descriptions:
-                            eng-GB: 'My content type'
-                        fieldgroup: content
+                            eng-GB: 'bpaulin_all'
+                        fieldGroup: content
                         position: 10
-                        translatable: true
-                        required: true
-                        searchable: true
+                        isTranslatable: true
+                        isRequired: true
+                        isSearchable: true
                     body:
                         type: 'ezstring'
-                        position: 10
+                        position: 20
         group2:
             bpaulin_virtual:
 #                extends: group1.bpaulin_all
-                mainLanguageCode: 'eng-virtual'
+                mainLanguageCode: 'eng-GB'
                 virtual: true
                 descriptions:
                     eng-GB: 'My content virtual'
+                    eng-GB: 'My content all'
                 fields:
                     name:
                         type: 'ezstring'
@@ -42,6 +45,7 @@ bpaulin_setup_ez_content_type:
         group3:
             bpaulin_another:
                 extends: group1.bpaulin_min
-                mainLanguageCode: 'eng-another'
-                descriptions:
-                    eng-GB: 'My content virtual'
+                mainLanguageCode: 'eng-GB'
+                names:
+                    eng-GB: 'bpaulin_another'
+                    eng-GB: 'bpaulin_another'

@@ -239,41 +239,35 @@ class Import extends ContainerAware
 
     public function hydrateField($fieldStructure, $fieldData)
     {
-        $fieldStructure->position = $fieldData['position'];
-
-        if ( isset( $fieldData['translatable'] ) )
+        $fields = array(
+            'position',
+            'isTranslatable',
+            'isRequired',
+            'isSearchable',
+            'fieldGroup'
+        );
+        foreach ( $fields as $field )
         {
-            $fieldStructure->isTranslatable = $fieldData['translatable'];
-        }
-        if ( isset( $fieldData['required'] ) )
-        {
-            $fieldStructure->isRequired = $fieldData['required'];
-        }
-        if ( isset( $fieldData['searchable'] ) )
-        {
-            $fieldStructure->isSearchable = $fieldData['searchable'];
-        }
-        if ( isset( $fieldData['fieldgroup'] ) )
-        {
-            $fieldStructure->fieldGroup = $fieldData['fieldgroup'];
-        }
-        if ( isset( $fieldData['names'] ) )
-        {
-            $names = array();
-            foreach ( $fieldData['names'] as $key => $value )
+            if ( isset( $fieldData[$field] ) )
             {
-                $names[str_replace( '_', '-', $key )] = $value;
+                $fieldStructure->$field = $fieldData[$field];
             }
-            $fieldStructure->names = $names;
         }
-        if ( isset( $fieldData['descriptions'] ) )
+        $fieldsArray = array(
+            'names',
+            'description'
+        );
+        foreach ( $fieldsArray as $field )
         {
-            $descriptions = array();
-            foreach ( $fieldData['descriptions'] as $key => $value )
+            if ( isset( $fieldData[$field] ) )
             {
-                $descriptions[str_replace( '_', '-', $key )] = $value;
+                $array = array();
+                foreach ( $fieldData[$field] as $key => $value )
+                {
+                    $array[str_replace( '_', '-', $key )] = $value;
+                }
+                $fieldStructure->$field = $array;
             }
-            $fieldStructure->descriptions = $descriptions;
         }
     }
 
