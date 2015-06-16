@@ -2,6 +2,7 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\FieldAttributeEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
@@ -248,10 +249,17 @@ class Import extends ContainerAware
         );
         foreach ( $fields as $field )
         {
+            $event = new FieldAttributeEvent();
+            $event->setOldValue( $fieldStructure->$field );
+            $event->setAttributeName( $field );
             if ( isset( $fieldData[$field] ) )
             {
                 $fieldStructure->$field = $fieldData[$field];
+                $event->setNewValue( $fieldStructure->$field );
             }
+            $this->getEventDispatcher()->dispatch(
+                Events::AFTER_FIELD_ATTRIBUTE_LOADING, $event
+            );
         }
         $fieldsArray = array(
             'names',

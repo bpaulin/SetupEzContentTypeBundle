@@ -1,6 +1,7 @@
 <?php
 namespace Bpaulin\SetupEzContentTypeBundle\Command;
 
+use Bpaulin\SetupEzContentTypeBundle\Event\FieldAttributeEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
@@ -157,6 +158,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             Events::AFTER_FIELD_DRAFT_LOADING => 'afterFieldDraftLoading',
             Events::AFTER_TYPE_STRUCTURE_LOADING => 'afterTypeStructureLoading',
             Events::AFTER_FIELD_STRUCTURE_LOADING => 'afterFieldStructureLoading',
+            Events::AFTER_FIELD_ATTRIBUTE_LOADING => 'afterFieldAttributeLoading',
         );
     }
 
@@ -188,5 +190,10 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     public function afterFieldStructureLoading(FieldStructureEvent $event)
     {
         $this->output->writeln( '    field structure: '.$event->getStatus() );
+    }
+
+    public function afterFieldAttributeLoading(FieldAttributeEvent $event)
+    {
+        $this->output->writeln( '    field attribute: '.$event->getAttributeName().' '.$event->getOldValue().'->'.$event->getNewValue() );
     }
 }

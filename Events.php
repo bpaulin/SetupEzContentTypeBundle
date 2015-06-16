@@ -16,6 +16,7 @@ final class Events
     const AFTER_FIELD_DRAFT_LOADING = "bpaulin_setupezcontentfield.after_field_draft_loading";
     const AFTER_FIELD_STRUCTURE_LOADING = "bpaulin_setupezcontentfield.after_field_structure_loading";
     const AFTER_TYPE_STRUCTURE_LOADING = "bpaulin_setupezcontenttype.after_type_structure_loading";
+    const AFTER_FIELD_ATTRIBUTE_LOADING = "bpaulin_setupezcontenttype.after_field_attribute_loading";
 
     /**
      * Status
