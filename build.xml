@@ -13,8 +13,7 @@
         <exec executable="./bin/phpcs" passthru="true" checkreturn="true">
             <arg value="-p"/>
             <arg value="--standard=vendor/ezsystems/ezcs/php/ezcs/ruleset.xml"/>
-            <arg value="--ignore=vendor,bin"/>
-            <arg path="."/>
+            <arg path="src"/>
         </exec>
     </target>
 </project>

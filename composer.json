@@ -11,7 +11,7 @@
         "bin-dir": "bin"
     },
     "autoload": {
-        "psr-4": { "Bpaulin\\SetupEzContentTypeBundle\\" : "" }
+        "psr-4": { "Bpaulin\\SetupEzContentTypeBundle\\" : "src/" }
     },
     "require": {
         "ezsystems/ezpublish-kernel": "v2014.11.8"

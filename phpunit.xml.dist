@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="./Tests/bootstrap.php">
+<phpunit bootstrap="./src/Tests/bootstrap.php">
     <php>
         <!-- <server name="SYMFONY" value="/path/to/symfony" /> -->
     </php>
     <testsuites>
-        <testsuite name="FacebookBundle Test Suite">
-            <directory suffix="Test.php">./Tests</directory>
+        <testsuite name="setupez Test Suite">
+            <directory suffix="Test.php">./src/Tests</directory>
         </testsuite>
     </testsuites>
     <filter>
         <whitelist>
-            <directory>./</directory>
+            <directory>./src/</directory>
             <exclude>
                 <directory>./Tests</directory>
             </exclude>
