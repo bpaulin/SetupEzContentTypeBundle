@@ -16,4 +16,22 @@
             <arg path="src"/>
         </exec>
     </target>
+
+    <target name="build" depends="clean, phpdoc, phploc"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="phploc">
+        <exec command="./bin/phploc src/ > build/phploc.txt"/>
+    </target>
+
+    <target name="phpdoc">
+        <exec executable="./bin/phpdoc" passthru="true" checkreturn="true">
+            <arg value="--directory=src"/>
+            <arg value="--target=build/phpdoc"/>
+            <arg value="--template=responsive-twig"/>
+        </exec>
+    </target>
 </project>
