@@ -4,8 +4,15 @@ php:
   - 5.4
   - 5.5
 
+env:
+  - EZPUBLISH_VERSION="2014.11.*"
+  - EZPUBLISH_VERSION="2014.07.*"
+  - EZPUBLISH_VERSION="2014.05.*"
+  - EZPUBLISH_VERSION="2014.01.*"
+
 before_install:
   - composer selfupdate
+  - composer require "ezsystems/ezpublish-kernel:${EZPUBLISH_VERSION}" --no-update
 
 install:
   - composer install --prefer-dist --no-interaction
