@@ -14,7 +14,7 @@
         "psr-4": { "Bpaulin\\SetupEzContentTypeBundle\\" : "src/" }
     },
     "require": {
-        "ezsystems/ezpublish-kernel": "*"
+        "ezsystems/ezpublish-kernel": "2014.11.*"
     },
     "require-dev": {
         "ezsystems/ezcs": "dev-master",

@@ -8,6 +8,7 @@ env:
   - EZPUBLISH_VERSION="2014.11.*"
   - EZPUBLISH_VERSION="2014.07.*"
   - EZPUBLISH_VERSION="2014.05.*"
+  - EZPUBLISH_VERSION="2014.03.*"
   - EZPUBLISH_VERSION="2014.01.*"
 
 before_install:
@@ -15,7 +16,7 @@ before_install:
   - composer require "ezsystems/ezpublish-kernel:${EZPUBLISH_VERSION}" --no-update
 
 install:
-  - composer install --prefer-dist --no-interaction
+  - composer update --prefer-dist --no-interaction
 
 script:
   - ./bin/phing ci
