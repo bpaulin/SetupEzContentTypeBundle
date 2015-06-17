@@ -2,7 +2,7 @@
 
 <project name="puzzle" default="ci">
 
-    <target name="ci" depends="phpunit,phpcs"/>
+    <target name="ci" depends="phpunit,phpcs,phpcpd,phpmd"/>
 
     <target name="phpunit">
         <exec executable="./bin/phpunit" passthru="true" checkreturn="true">
@@ -14,6 +14,20 @@
             <arg value="-p"/>
             <arg value="--standard=vendor/ezsystems/ezcs/php/ezcs/ruleset.xml"/>
             <arg path="src"/>
+        </exec>
+    </target>
+
+    <target name="phpcpd">
+        <exec executable="./bin/phpcpd" passthru="true" checkreturn="true">
+            <arg path="src"/>
+        </exec>
+    </target>
+
+    <target name="phpmd">
+        <exec executable="./bin/phpmd" passthru="true" checkreturn="true">
+            <arg path="src"/>
+            <arg value="text"/>
+            <arg value="cleancode,codesize,controversial,design,naming,unusedcode"/>
         </exec>
     </target>
 
