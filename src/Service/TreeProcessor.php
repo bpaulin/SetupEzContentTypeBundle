@@ -2,6 +2,7 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
+use Bpaulin\SetupEzContentTypeBundle\Exception\CircularException;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
@@ -24,9 +25,9 @@ class TreeProcessor extends ContainerAware
     /**
      * extend a type with another
      *
-     * @param $type     array   child type
-     * @param $extends  array   parent type
-     * @return array    extended type
+     * @param   &$type    array       child type
+     * @param   $extends  array       parent type
+     * @return  array     extended    type
      */
     protected function mergeType( &$type, $extends )
     {
@@ -44,6 +45,12 @@ class TreeProcessor extends ContainerAware
         return $type;
     }
 
+    /**
+     * flatten groups in 1-dim array types
+     *
+     * @param  $groups array raw config data
+     * @return array
+     */
     protected function storeTypes( $groups )
     {
         $types = array();
@@ -58,6 +65,13 @@ class TreeProcessor extends ContainerAware
         return $types;
     }
 
+    /**
+     * build a array for every fields with hierarchy
+     *
+     * @param  $types    array   types
+     * @return array types hierarchy
+     * @throws CircularException if a circular hierarchy is detected
+     */
     protected function buildExtendsTree( $types )
     {
         $extends = array();
@@ -71,7 +85,7 @@ class TreeProcessor extends ContainerAware
                 {
                     if ( in_array( $typeExtends['extends'], $extends[$typeKey] ) )
                     {
-                        throw new \Exception( 'circular extends' );
+                        throw new CircularException();
                     }
                     $extends[$typeKey][] = $typeExtends['extends'];
                     $typeExtends = $types[$typeExtends['extends']];
@@ -83,6 +97,13 @@ class TreeProcessor extends ContainerAware
         return $extends;
     }
 
+    /**
+     * extends every types with his ancestor
+     *
+     * @param $types    array   types
+     * @param $extends  array   types hierarchy
+     * @return array types extended
+     */
     protected function extendTypes( $types, $extends)
     {
         $extendedTypes = array();
@@ -100,6 +121,12 @@ class TreeProcessor extends ContainerAware
         return $extendedTypes;
     }
 
+    /**
+     * Split types by group
+     *
+     * @param $types array types
+     * @return array    groups
+     */
     protected function splitByGroup( $types )
     {
         $tree = array();

@@ -151,7 +151,7 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $method->setAccessible( true );
 
         $processor = new TreeProcessor();
-        $this->setExpectedException( 'Exception', "circular extends" );
+        $this->setExpectedException( '\Bpaulin\SetupEzContentTypeBundle\Exception\CircularException' );
         $this->assertEquals( null, $method->invoke( $processor, $input ) );
     }
 

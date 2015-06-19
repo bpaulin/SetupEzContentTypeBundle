@@ -1,5 +1,4 @@
 <?php
-
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldAttributeEvent;
@@ -9,7 +8,6 @@ use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
-use eZ\Publish\Core\REST\Client\ContentTypeService;
 use eZ\Publish\SPI\Persistence\Content\Type\Group;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
