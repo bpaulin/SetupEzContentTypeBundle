@@ -75,7 +75,7 @@ class Import extends ContainerAware
     /**
      * @return bool
      */
-    public function getForce()
+    public function isForce()
     {
         return $this->force;
     }
@@ -94,7 +94,7 @@ class Import extends ContainerAware
         }
         catch (\eZ\Publish\API\Repository\Exceptions\NotFoundException $e)
         {
-            if ( $this->getForce() )
+            if ( $this->isForce() )
             {
                 $contentTypeGroup = $this->getContentTypeService()->createContentTypeGroup(
                     $this->getContentTypeService()->newContentTypeGroupCreateStruct( $groupName )
@@ -144,16 +144,12 @@ class Import extends ContainerAware
     public function getTypeStructure( $typeDraft, $typeName )
     {
         $event = new TypeStructureEvent();
-        if ( $typeDraft )
-        {
-            $structure = $this->getContentTypeService()->newContentTypeUpdateStruct();
-            $event->setStatus( Events::STATUS_UPDATE_STRUCTURE );
-        }
-        else
-        {
-            $structure = $this->getContentTypeService()->newContentTypeCreateStruct( $typeName );
-            $event->setStatus( Events::STATUS_CREATE_STRUCTURE );
-        }
+
+        $structure = ( $typeDraft ) ?
+            $this->getContentTypeService()->newContentTypeUpdateStruct():
+            $this->getContentTypeService()->newContentTypeCreateStruct( $typeName );
+        $event->setStatus( ( $typeDraft ) ?  Events::STATUS_UPDATE_STRUCTURE : Events::STATUS_CREATE_STRUCTURE );
+
         $event->setTypeStructure( $structure );
 
         $this->getEventDispatcher()->dispatch(
@@ -219,16 +215,12 @@ class Import extends ContainerAware
     public function getFieldStructure( $fieldDraft, $fieldName, $fieldType )
     {
         $event = new FieldStructureEvent();
-        if ( $fieldDraft )
-        {
-            $structure = $this->getContentTypeService()->newFieldDefinitionUpdateStruct();
-            $event->setStatus( Events::STATUS_UPDATE_STRUCTURE );
-        }
-        else
-        {
-            $structure = $this->getContentTypeService()->newFieldDefinitionCreateStruct( $fieldName, $fieldType );
-            $event->setFieldStructure( Events::STATUS_CREATE_STRUCTURE );
-        }
+
+        $structure = ( $fieldDraft ) ?
+            $this->getContentTypeService()->newFieldDefinitionUpdateStruct():
+            $this->getContentTypeService()->newFieldDefinitionCreateStruct( $fieldName, $fieldType );
+        $event->setStatus( ( $fieldDraft ) ?  Events::STATUS_UPDATE_STRUCTURE : Events::STATUS_CREATE_STRUCTURE );
+
         $event->setFieldStructure( $structure );
 
         $this->getEventDispatcher()->dispatch(
@@ -283,16 +275,14 @@ class Import extends ContainerAware
     {
         if ( $typeDraft )
         {
-            $this->getContentTypeService()->updateFieldDefinition(
+            return $this->getContentTypeService()->updateFieldDefinition(
                 $typeDraft,
                 $typeDraft->getFieldDefinition( $fieldDraft->identifier ),
                 $fieldStructure
             );
         }
-        else
-        {
-            $typeStructure->addFieldDefinition( $fieldStructure );
-        }
+
+        return $typeStructure->addFieldDefinition( $fieldStructure );
     }
 
     public function addTypeToGroup( $typeDraft, $typeStructure, $groupDraft )
@@ -300,16 +290,14 @@ class Import extends ContainerAware
         if ( $typeDraft )
         {
             $this->getContentTypeService()->updateContentTypeDraft( $typeDraft, $typeStructure );
-            $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
+            return $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
         }
-        else
-        {
-            $typeDraft = $this->getContentTypeService()->createContentType(
-                $typeStructure,
-                array( $groupDraft )
-            );
-            $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
-        }
+
+        $typeDraft = $this->getContentTypeService()->createContentType(
+            $typeStructure,
+            array( $groupDraft )
+        );
+        return $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
     }
 
 }

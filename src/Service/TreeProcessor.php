@@ -44,18 +44,8 @@ class TreeProcessor extends ContainerAware
         return $type;
     }
 
-    /**
-     * process groups to extend and clean types
-     *
-     * @param $groups   array   raw config data
-     * @return array    array   processed tree
-     * @throws \Exception if circular extends is detected
-     */
-    protected function processGroup( $groups )
+    protected function storeTypes( $groups )
     {
-        /*
-         * store types
-         */
         $types = array();
         foreach ( $groups as $groupName => $group )
         {
@@ -65,10 +55,11 @@ class TreeProcessor extends ContainerAware
                 $types[$typeKey] = $type;
             }
         }
+        return $types;
+    }
 
-        /*
-         * build extends tree
-         */
+    protected function buildExtendsTree( $types )
+    {
         $extends = array();
         foreach ( $types as $typeKey => $type )
         {
@@ -84,19 +75,18 @@ class TreeProcessor extends ContainerAware
                     }
                     $extends[$typeKey][] = $typeExtends['extends'];
                     $typeExtends = $types[$typeExtends['extends']];
+                    continue;
                 }
-                else
-                {
-                    break;
-                }
+                break;
             }
         }
+        return $extends;
+    }
 
-        /*
-         * extends type
-         */
+    protected function extendTypes( $types, $extends)
+    {
         $extendedTypes = array();
-        foreach ( $types as $typeKey => $type )
+        foreach ( array_keys( $types ) as $typeKey )
         {
             array_unshift( $extends[$typeKey], $typeKey );
             $extendedType = array();
@@ -107,11 +97,11 @@ class TreeProcessor extends ContainerAware
             $extendedType['virtual'] = ( isset( $types[$typeKey]['virtual'] ) )? $types[$typeKey]['virtual']: false;
             $extendedTypes[$typeKey] = $extendedType;
         }
-        $types = $extendedTypes;
+        return $extendedTypes;
+    }
 
-        /*
-         * Split by group
-         */
+    protected function splitByGroup( $types )
+    {
         $tree = array();
         foreach ( $types as $typeKey => $type )
         {
@@ -127,8 +117,22 @@ class TreeProcessor extends ContainerAware
                 $tree[$group][$name] = $type;
             }
         }
-
         return $tree;
+    }
+
+    /**
+     * process groups to extend and clean types
+     *
+     * @param $groups   array   raw config data
+     * @return array    array   processed tree
+     * @throws \Exception if circular extends is detected
+     */
+    protected function processGroup( $groups )
+    {
+        $types = $this->storeTypes( $groups );
+        $extends = $this->buildExtendsTree( $types );
+        $types = $this->extendTypes( $types, $extends );
+        return $this->splitByGroup( $types );
     }
 
     /**

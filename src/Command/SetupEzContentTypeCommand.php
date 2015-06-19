@@ -98,8 +98,6 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         /*
          * call services
          */
-        $tree = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' )->getTree();
-        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
         $repository = $this->getContainer()->get( 'ezpublish.api.repository' );
 
         /*
@@ -112,10 +110,17 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         $dispatcher = $this->getContainer()->get( "event_dispatcher" );
         $dispatcher->addSubscriber( $this );
 
+        return $this->runImport();
+    }
+
+    protected function runImport()
+    {
+        $tree = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' )->getTree();
+        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
         /*
          * and finally, at least, do something
          */
-        $importService->setForce( $input->getOption( 'force' ) );
+        $importService->setForce( $this->input->getOption( 'force' ) );
         foreach ( $tree as $groupName => $groupData )
         {
             $groupDraft = $importService->getGroupDraft( $groupName );

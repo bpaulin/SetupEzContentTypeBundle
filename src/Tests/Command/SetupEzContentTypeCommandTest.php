@@ -155,17 +155,17 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
         $container->expects( $this->exactly( 4 ) )
             ->method( 'get' )
             ->withConsecutive(
-                array( 'bpaulin.setupezcontenttype.treeprocessor' ),
-                array( 'bpaulin.setupezcontenttype.import' ),
                 array( 'ezpublish.api.repository' ),
-                array( 'event_dispatcher' )
+                array( 'event_dispatcher' ),
+                array( 'bpaulin.setupezcontenttype.treeprocessor' ),
+                array( 'bpaulin.setupezcontenttype.import' )
             )
             ->will(
                 $this->onConsecutiveCalls(
-                    $treeProcessor,
-                    $import,
                     $repository,
-                    $dispatcher
+                    $dispatcher,
+                    $treeProcessor,
+                    $import
                 )
             );
         $this->command->setContainer( $container );
