@@ -3,3 +3,4 @@
 /bin/
 /build/
 phpunit.xml
+composer.phar
