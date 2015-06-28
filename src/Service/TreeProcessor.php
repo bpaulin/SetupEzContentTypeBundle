@@ -2,7 +2,7 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
-use Bpaulin\SetupEzContentTypeBundle\Exception\CircularException;
+use Bpaulin\SetupEzContentTypeBundle\Exception\CircularExtendsException;
 use Bpaulin\SetupEzContentTypeBundle\Exception\FieldTypeNotImplementedException;
 use Bpaulin\SetupEzContentTypeBundle\Exception\NoFieldsException;
 use Bpaulin\SetupEzContentTypeBundle\Exception\NoNameForMainLanguageException;
@@ -88,7 +88,7 @@ class TreeProcessor extends ContainerAware
                 {
                     if ( in_array( $typeExtends['extends'], $extends[$typeKey] ) )
                     {
-                        throw new CircularException();
+                        throw new CircularExtendsException( $typeKey );
                     }
                     $extends[$typeKey][] = $typeExtends['extends'];
                     $typeExtends = $types[$typeExtends['extends']];
