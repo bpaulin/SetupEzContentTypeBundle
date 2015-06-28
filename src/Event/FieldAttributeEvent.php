@@ -18,7 +18,6 @@ class FieldAttributeEvent extends ImportEvent
      */
     public function getOldValue()
     {
-//        return $this->valueToString( $this->oldValue );
         return $this->oldValue;
     }
 
@@ -28,6 +27,7 @@ class FieldAttributeEvent extends ImportEvent
     public function setOldValue($oldValue)
     {
         $this->oldValue = $oldValue;
+        return $this;
     }
 
     /**
@@ -35,7 +35,6 @@ class FieldAttributeEvent extends ImportEvent
      */
     public function getNewValue()
     {
-//        return $this->valueToString( $this->newValue );
         return $this->newValue;
     }
 
@@ -45,18 +44,6 @@ class FieldAttributeEvent extends ImportEvent
     public function setNewValue($newValue)
     {
         $this->newValue = $newValue;
-    }
-
-    protected function valueToString( $value )
-    {
-        if ( $value === true )
-        {
-            return 'true';
-        }
-        if ( $value === false )
-        {
-            return 'false';
-        }
-        return $value;
+        return $this;
     }
 }
