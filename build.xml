@@ -31,7 +31,7 @@
         </exec>
     </target>
 
-    <target name="build" depends="clean, phpdoc, phploc"/>
+    <target name="report" depends="clean, phpdoc, phploc, coverage"/>
 
     <target name="clean">
         <delete dir="build"/>
@@ -46,6 +46,12 @@
             <arg value="--directory=src"/>
             <arg value="--target=build/phpdoc"/>
             <arg value="--template=responsive-twig"/>
+        </exec>
+    </target>
+
+    <target name="coverage">
+        <exec executable="./bin/phpunit" passthru="true" checkreturn="true">
+            <arg value="--coverage-html=build/coverage"/>
         </exec>
     </target>
 </project>
