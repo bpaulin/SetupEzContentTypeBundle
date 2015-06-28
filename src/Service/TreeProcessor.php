@@ -3,6 +3,7 @@
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Exception\CircularException;
+use Bpaulin\SetupEzContentTypeBundle\Exception\NoFieldsException;
 use Bpaulin\SetupEzContentTypeBundle\Exception\NoNameForMainLanguageException;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
@@ -157,6 +158,10 @@ class TreeProcessor extends ContainerAware
                 if ( !array_key_exists( $type['mainLanguageCode'], $type['names'] ) )
                 {
                     throw new NoNameForMainLanguageException( $name );
+                }
+                if ( empty( $type['fields'] ) || count( $type['fields'] ) == 0 )
+                {
+                    throw new NoFieldsException( $name );
                 }
             }
         }

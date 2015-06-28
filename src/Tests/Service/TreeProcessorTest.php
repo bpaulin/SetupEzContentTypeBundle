@@ -71,6 +71,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                             "mainLanguageCode" => "eng-GB",
                             "names" => array(
                                 "eng-GB" => "type11"
+                            ),
+                            "fields" => array(
+                                "field1" => array()
                             )
                         ),
                         "type12" => array(
@@ -103,6 +106,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                             "mainLanguageCode" => "eng-GB",
                             "names" => array(
                                 "eng-GB" => "type11"
+                            ),
+                            "fields" => array(
+                                "field1" => array()
                             )
                         ),
                         "type12" => array(
@@ -138,7 +144,19 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                array(),
+                array(
+                    "group1" => array(
+                        "type1" => array(
+                            'mainLanguageCode' => 'eng-GB',
+                            'names' => array(
+                                'eng-GB' => 'name'
+                            ),
+                            'fields' => array(
+                                'name' => array()
+                            )
+                        )
+                    )
+                ),
                 false
             ),
             array(
@@ -147,7 +165,23 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                         "type1" => array(
                             'mainLanguageCode' => 'eng-GB',
                             'names' => array(
+                                'eng-GB' => 'name'
+                            )
+                        )
+                    )
+                ),
+                'NoFields'
+            ),
+            array(
+                array(
+                    "group1" => array(
+                        "type1" => array(
+                            'mainLanguageCode' => 'eng-GB',
+                            'names' => array(
                                 'fre-FR' => 'name'
+                            ),
+                            'fields' => array(
+                                'name' => array()
                             )
                         )
                     )
