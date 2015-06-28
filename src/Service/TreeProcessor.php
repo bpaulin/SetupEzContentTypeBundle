@@ -3,6 +3,7 @@
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Exception\CircularException;
+use Bpaulin\SetupEzContentTypeBundle\Exception\FieldTypeNotImplementedException;
 use Bpaulin\SetupEzContentTypeBundle\Exception\NoFieldsException;
 use Bpaulin\SetupEzContentTypeBundle\Exception\NoNameForMainLanguageException;
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -153,15 +154,22 @@ class TreeProcessor extends ContainerAware
     {
         foreach ( $groups as $group )
         {
-            foreach ( $group as $name => $type )
+            foreach ( $group as $typeName => $type )
             {
                 if ( !array_key_exists( $type['mainLanguageCode'], $type['names'] ) )
                 {
-                    throw new NoNameForMainLanguageException( $name );
+                    throw new NoNameForMainLanguageException( $typeName );
                 }
                 if ( empty( $type['fields'] ) || count( $type['fields'] ) == 0 )
                 {
-                    throw new NoFieldsException( $name );
+                    throw new NoFieldsException( $typeName );
+                }
+                foreach ( $type['fields'] as $fieldName => $field )
+                {
+                    if ( empty( $field['type'] ) || !in_array( $field['type'], array( 'ezstring' ) ) )
+                    {
+                        throw new FieldTypeNotImplementedException( $fieldName );
+                    }
                 }
             }
         }

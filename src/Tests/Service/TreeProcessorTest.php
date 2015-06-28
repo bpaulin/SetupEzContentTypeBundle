@@ -73,7 +73,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 "eng-GB" => "type11"
                             ),
                             "fields" => array(
-                                "field1" => array()
+                                "field1" => array(
+                                    "type" => 'ezstring'
+                                )
                             )
                         ),
                         "type12" => array(
@@ -83,7 +85,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 "eng-GB" => "type12"
                             ),
                             "fields" => array(
-                                "field1" => array()
+                                "field1" => array(
+                                    "type" => 'ezstring'
+                                )
                             ),
                         ),
                     ),
@@ -94,7 +98,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 "eng-GB" => "type22"
                             ),
                             "fields" => array(
-                                "field2" => array()
+                                "field2" => array(
+                                    "type" => 'ezstring'
+                                )
                             ),
                             "virtual" => true
                         ),
@@ -108,7 +114,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 "eng-GB" => "type11"
                             ),
                             "fields" => array(
-                                "field1" => array()
+                                "field1" => array(
+                                    "type" => 'ezstring'
+                                )
                             )
                         ),
                         "type12" => array(
@@ -117,8 +125,12 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 "eng-GB" => "type12"
                             ),
                             "fields" => array(
-                                "field1" => array(),
-                                "field2" => array(),
+                                "field1" => array(
+                                    "type" => 'ezstring'
+                                ),
+                                "field2" => array(
+                                    "type" => 'ezstring'
+                                ),
                             ),
                         ),
                     )
@@ -152,7 +164,9 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 'eng-GB' => 'name'
                             ),
                             'fields' => array(
-                                'name' => array()
+                                'name' => array(
+                                    'type' => 'ezstring'
+                                ),
                             )
                         )
                     )
@@ -181,12 +195,30 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                                 'fre-FR' => 'name'
                             ),
                             'fields' => array(
-                                'name' => array()
+                                'name' => array(),
+                                'type' => 'ezstring'
                             )
                         )
                     )
                 ),
                 'NoNameForMainLanguage'
+            ),
+            array(
+                array(
+                    "group1" => array(
+                        "type1" => array(
+                            'mainLanguageCode' => 'eng-GB',
+                            'names' => array(
+                                'eng-GB' => 'name'
+                            ),
+                            'fields' => array(
+                                'name' => array(),
+                                'type' => 'UNKNOW_TYPE'
+                            )
+                        )
+                    )
+                ),
+                'FieldTypeNotImplemented'
             ),
             array(
                 array(
