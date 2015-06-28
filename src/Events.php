@@ -13,6 +13,7 @@ final class Events
      */
     const AFTER_GROUP_LOADING = "bpaulin_setupezcontenttype.after_group_loading";
     const AFTER_TYPE_DRAFT_LOADING = "bpaulin_setupezcontenttype.after_type_draft_loading";
+    const AFTER_TYPE_LOADING = "bpaulin_setupezcontenttype.after_type_loading";
     const AFTER_FIELD_DRAFT_LOADING = "bpaulin_setupezcontentfield.after_field_draft_loading";
     const AFTER_FIELD_STRUCTURE_LOADING = "bpaulin_setupezcontentfield.after_field_structure_loading";
     const AFTER_TYPE_STRUCTURE_LOADING = "bpaulin_setupezcontenttype.after_type_structure_loading";

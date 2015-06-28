@@ -208,4 +208,15 @@ class TreeProcessor extends ContainerAware
 
         return $this->tree;
     }
+
+    public function countTypes()
+    {
+        $groups = $this->getTree();
+        $count = 0;
+        foreach ( $groups as $group )
+        {
+            $count += count( $group );
+        }
+        return $count;
+    }
 }

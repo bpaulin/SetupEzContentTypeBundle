@@ -6,6 +6,7 @@ use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\TypeLoadingEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use eZ\Publish\SPI\Persistence\Content\Type\Group;
@@ -108,35 +109,53 @@ class Import extends ContainerAware
         return $contentTypeGroup;
     }
 
-    public function getTypeDraft ($typeName )
+    public function getType ( $typeName )
     {
-        $event = new TypeDraftEvent();
+        $event = new TypeLoadingEvent();
         $event->setTypeName( $typeName )
             ->setStatus( Events::STATUS_MISSING );
         try
         {
             $contentType = $this->getContentTypeService()->loadContentTypeByIdentifier( $typeName );
-            try
-            {
-                $contentType = $this->getContentTypeService()->createContentTypeDraft( $contentType );
-                $event->setStatus( Events::STATUS_CREATED );
-            }
-            catch (\eZ\Publish\Core\Base\Exceptions\BadStateException $e)
-            {
-                $contentType = $this->getContentTypeService()->loadContentTypeDraft( $contentType->id );
-                $event->setStatus( Events::STATUS_LOADED );
-            }
+            $event->setStatus( Events::STATUS_LOADED );
         }
         catch (\eZ\Publish\API\Repository\Exceptions\NotFoundException $e)
         {
             $contentType = false;
         }
-        $event->setTypeDraft( $contentType );
+        $event->setType( $contentType );
+
+        $this->getEventDispatcher()->dispatch(
+            Events::AFTER_TYPE_LOADING, $event
+        );
+        return $contentType;
+    }
+
+    public function getTypeDraft ( $typeName, $contentType )
+    {
+        $event = new TypeDraftEvent();
+        $event->setTypeName( $typeName )
+            ->setStatus( Events::STATUS_MISSING );
+        $contentTypeDraft = false;
+        if ( $contentType )
+        {
+            try
+            {
+                $contentTypeDraft = $this->getContentTypeService()->createContentTypeDraft( $contentType );
+                $event->setStatus( Events::STATUS_CREATED );
+            }
+            catch ( \eZ\Publish\Core\Base\Exceptions\BadStateException $e)
+            {
+                $contentTypeDraft = $this->getContentTypeService()->loadContentTypeDraft( $contentType->id );
+                $event->setStatus( Events::STATUS_LOADED );
+            }
+        }
+        $event->setTypeDraft( $contentTypeDraft );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_TYPE_DRAFT_LOADING, $event
         );
-        return $contentType;
+        return $contentTypeDraft;
     }
 
     public function getTypeStructure( $typeDraft, $typeName )

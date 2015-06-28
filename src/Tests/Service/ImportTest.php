@@ -82,6 +82,10 @@ class ImportTest extends \PHPUnit_Framework_TestCase
                     new \eZ\Publish\Core\Base\Exceptions\NotFoundException( '', '' )
                 )
             );
+
+        $this->contentTypeService->expects( $this->never() )
+            ->method( 'createContentTypeGroup' );;
+
         $event = new GroupLoadingEvent();
         $event->setGroupName( 'sdf' );
         $event->setStatus( Events::STATUS_MISSING );

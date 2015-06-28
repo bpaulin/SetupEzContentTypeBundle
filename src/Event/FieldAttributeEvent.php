@@ -35,7 +35,8 @@ class FieldAttributeEvent extends AbstractEvent
      */
     public function getOldValue()
     {
-        return $this->valueToString( $this->oldValue );
+//        return $this->valueToString( $this->oldValue );
+        return $this->oldValue;
     }
 
     /**
@@ -51,7 +52,8 @@ class FieldAttributeEvent extends AbstractEvent
      */
     public function getNewValue()
     {
-        return $this->valueToString( $this->newValue );
+//        return $this->valueToString( $this->newValue );
+        return $this->newValue;
     }
 
     /**

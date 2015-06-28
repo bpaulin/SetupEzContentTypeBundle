@@ -6,6 +6,7 @@ use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\TypeLoadingEvent;
 use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -115,18 +116,25 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
 
     protected function runImport()
     {
-        $tree = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' )->getTree();
-        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
+        $treeProcessor = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' );
+        $tree = $treeProcessor->getTree();
+        if ( !$this->output->isVerbose() )
+        {
+            $progress = $this->getHelperSet()->get( 'progress' );
+            $progress->start( $this->output, $treeProcessor->countTypes() );
+        }
         /*
          * and finally, at least, do something
          */
+        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
         $importService->setForce( $this->input->getOption( 'force' ) );
         foreach ( $tree as $groupName => $groupData )
         {
             $groupDraft = $importService->getGroupDraft( $groupName );
             foreach ( $groupData as $typeName => $typeData )
             {
-                $typeDraft = $importService->getTypeDraft( $typeName );
+                $type = $importService->getType( $typeName );
+                $typeDraft = $importService->getTypeDraft( $typeName, $type );
                 $typeStructure = $importService->getTypeStructure( $typeDraft, $typeName );
                 $importService->hydrateType( $typeStructure, $typeData );
 
@@ -145,9 +153,18 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
                         $typeStructure
                     );
                 }
+                if ( !$this->output->isVerbose() )
+                {
+                    $progress->advance();
+                }
                 $importService->addTypeToGroup( $typeDraft, $typeStructure, $groupDraft );
             }
         }
+        if ( !$this->output->isVerbose() )
+        {
+            $progress->finish();
+        }
+        return 0;
     }
 
     /**
@@ -159,6 +176,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     {
         return array(
             Events::AFTER_GROUP_LOADING => 'afterGroupLoading',
+            Events::AFTER_TYPE_LOADING => 'afterTypeLoading',
             Events::AFTER_TYPE_DRAFT_LOADING => 'afterTypeDraftLoading',
             Events::AFTER_FIELD_DRAFT_LOADING => 'afterFieldDraftLoading',
             Events::AFTER_TYPE_STRUCTURE_LOADING => 'afterTypeStructureLoading',
@@ -174,31 +192,97 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
      */
     public function afterGroupLoading(GroupLoadingEvent $event)
     {
-        $this->output->writeln( 'group '.$event->getGroupName().' '.$event->getStatus() );
+        if ( $this->output->isVerbose() )
+        {
+            $markMatches = array(
+                Events::STATUS_CREATED => 'comment',
+                Events::STATUS_MISSING => 'comment',
+                Events::STATUS_LOADED => 'info'
+            );
+            $status = $event->getStatus();
+            if ( isset( $markMatches[$status] ) )
+            {
+                $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
+            }
+            $this->output->writeln( 'group '.$event->getGroupName().' '.$status );
+        }
+    }
+
+    public function afterTypeLoading(TypeLoadingEvent $event)
+    {
+        if ( $this->output->isVerbose() )
+        {
+            $markMatches = array(
+                Events::STATUS_CREATED => 'comment',
+                Events::STATUS_MISSING => 'comment',
+                Events::STATUS_LOADED => 'info'
+            );
+            $status = $event->getStatus();
+            if ( isset( $markMatches[$status] ) )
+            {
+                $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
+            }
+            $this->output->writeln( '  type '.$event->getTypeName().' '.$status );
+        }
     }
 
     public function afterTypeDraftLoading(TypeDraftEvent $event)
     {
-        $this->output->writeln( '  type draft '.$event->getTypeName().' '.$event->getStatus() );
+        if ( $this->output->isVeryVerbose() )
+        {
+            $markMatches = array(
+                Events::STATUS_CREATED => 'comment',
+                Events::STATUS_MISSING => 'comment',
+                Events::STATUS_LOADED => 'info'
+            );
+            $status = $event->getStatus();
+            if ( isset( $markMatches[$status] ) )
+            {
+                $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
+            }
+            $this->output->writeln( '  type draft '.$event->getTypeName().' '.$status );
+        }
     }
 
     public function afterFieldDraftLoading(FieldDraftEvent $event)
     {
-        $this->output->writeln( '    field draft '.$event->getFieldName().' '.$event->getStatus() );
+        if ( $this->output->isVerbose() )
+        {
+            $markMatches = array(
+                Events::STATUS_CREATED => 'comment',
+                Events::STATUS_MISSING => 'comment',
+                Events::STATUS_LOADED => 'info'
+            );
+            $status = $event->getStatus();
+            if ( isset( $markMatches[$status] ) )
+            {
+                $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
+            }
+            $this->output->writeln( '    field '.$event->getFieldName().' '.$status );
+        }
     }
 
     public function afterTypeStructureLoading(TypeStructureEvent $event)
     {
-        $this->output->writeln( '  type structure: '.$event->getStatus() );
+        if ( $this->output->isVeryVerbose() )
+        {
+            $this->output->writeln( '  type structure: '.$event->getStatus() );
+        }
     }
 
     public function afterFieldStructureLoading(FieldStructureEvent $event)
     {
-        $this->output->writeln( '    field structure: '.$event->getStatus() );
+        if ( $this->output->isVeryVerbose() )
+        {
+            $this->output->writeln( '    field structure: '.$event->getStatus() );
+        }
     }
 
     public function afterFieldAttributeLoading(FieldAttributeEvent $event)
     {
-        $this->output->writeln( '      field attribute: '.$event->getAttributeName().' '.$event->getOldValue().' -> '.$event->getNewValue() );
+        if ( $this->output->isVeryVerbose() || ( $this->output->isVerbose() && $event->getOldValue() != $event->getNewValue() ) )
+        {
+            $this->output->writeln( '      attribute '.$event->getAttributeName().' '.$event->getOldValue().' -> <comment>'.$event->getNewValue().'</comment>' );
+        }
     }
 }

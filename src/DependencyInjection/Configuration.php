@@ -53,9 +53,9 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                             ->scalarNode( 'fieldGroup' )->end()
                                             ->integerNode( 'position' )->end() // required
-                                            ->scalarNode( 'isTranslatable' )->end()
-                                            ->scalarNode( 'isRequired' )->end()
-                                            ->scalarNode( 'isSearchable' )->end()
+                                            ->scalarNode( 'isTranslatable' )->defaultValue( true )->end()
+                                            ->scalarNode( 'isRequired' )->defaultValue( false )->end()
+                                            ->scalarNode( 'isSearchable' )->defaultValue( true )->end()
                                         ->end()
                                     ->end()
                                 ->end()
