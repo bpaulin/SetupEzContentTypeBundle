@@ -68,13 +68,13 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                 array(
                     "group1" => array(
                         "type11" => array(
-                            "mainLanguageCode" => "eng",
+                            "mainLanguageCode" => "eng-GB",
                             "names" => array(
                                 "eng-GB" => "type11"
                             )
                         ),
                         "type12" => array(
-                            "mainLanguageCode" => "eng",
+                            "mainLanguageCode" => "eng-GB",
                             "extends" => "group2.type22",
                             "names" => array(
                                 "eng-GB" => "type12"
@@ -86,7 +86,7 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                     ),
                     "group2" => array(
                         "type22" => array(
-                            "mainLanguageCode" => "fre",
+                            "mainLanguageCode" => "eng-GB",
                             "names" => array(
                                 "eng-GB" => "type22"
                             ),
@@ -100,13 +100,13 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
                 array(
                     "group1" => array(
                         "type11" => array(
-                            "mainLanguageCode" => "eng",
+                            "mainLanguageCode" => "eng-GB",
                             "names" => array(
                                 "eng-GB" => "type11"
                             )
                         ),
                         "type12" => array(
-                            "mainLanguageCode" => "eng",
+                            "mainLanguageCode" => "eng-GB",
                             "names" => array(
                                 "eng-GB" => "type12"
                             ),
@@ -134,47 +134,61 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals( $expected, $method->invoke( $processor, $config ) );
     }
 
-    public function testCircularExtends()
+    public function getTreeProvider()
     {
-        $input = array(
-            "group1" => array(
-                "type11" => array(
-                    "extends" => "group1.type12"
+        return array(
+            array(
+                array(),
+                false
+            ),
+            array(
+                array(
+                    "group1" => array(
+                        "type1" => array(
+                            'mainLanguageCode' => 'eng-GB',
+                            'names' => array(
+                                'fre-FR' => 'name'
+                            )
+                        )
+                    )
                 ),
-                "type12" => array(
-                    "extends" => "group1.type11"
+                'NoNameForMainLanguage'
+            ),
+            array(
+                array(
+                    "group1" => array(
+                        "type11" => array(
+                            "extends" => "group1.type12"
+                        ),
+                        "type12" => array(
+                            "extends" => "group1.type11"
+                        ),
+                    )
                 ),
+                'Circular'
             )
         );
-        $class = new \ReflectionClass( 'Bpaulin\\SetupEzContentTypeBundle\\Service\\TreeProcessor' );
-        $method = $class->getMethod( 'processGroup' );
-        $method->setAccessible( true );
-
-        $processor = new TreeProcessor();
-        $this->setExpectedException( '\Bpaulin\SetupEzContentTypeBundle\Exception\CircularException' );
-        $this->assertEquals( null, $method->invoke( $processor, $input ) );
     }
 
-    public function testGetTree()
+    /**
+     * @dataProvider getTreeProvider
+     */
+    public function testGetTree( $config, $exception )
     {
         $container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
         $container->expects( $this->once() )
             ->method( 'getParameter' )
             ->with( 'bpaulin_setup_ez_content_type.groups' )
-            ->will(
-                $this->returnValue(
-                    array(
-                        "group1" => array(
-                            "field1" => array()
-                        )
-                    )
-                )
-            );
+            ->will( $this->returnValue( $config ) );
+
+        if ( $exception )
+        {
+            $this->setExpectedException( '\Bpaulin\SetupEzContentTypeBundle\Exception\\'.$exception.'Exception' );
+        }
 
         $processor = new TreeProcessor();
         $processor->setContainer( $container );
-        $processor->getTree();
         $processor->getTree();
     }
 }

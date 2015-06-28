@@ -3,6 +3,7 @@
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Exception\CircularException;
+use Bpaulin\SetupEzContentTypeBundle\Exception\NoNameForMainLanguageException;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
 /**
@@ -147,6 +148,20 @@ class TreeProcessor extends ContainerAware
         return $tree;
     }
 
+    protected function checkTree( $groups )
+    {
+        foreach ( $groups as $group )
+        {
+            foreach ( $group as $name => $type )
+            {
+                if ( !array_key_exists( $type['mainLanguageCode'], $type['names'] ) )
+                {
+                    throw new NoNameForMainLanguageException( $name );
+                }
+            }
+        }
+    }
+
     /**
      * process groups to extend and clean types
      *
@@ -159,7 +174,9 @@ class TreeProcessor extends ContainerAware
         $types = $this->storeTypes( $groups );
         $extends = $this->buildExtendsTree( $types );
         $types = $this->extendTypes( $types, $extends );
-        return $this->splitByGroup( $types );
+        $groups = $this->splitByGroup( $types );
+        $this->checkTree( $groups );
+        return $groups;
     }
 
     /**
