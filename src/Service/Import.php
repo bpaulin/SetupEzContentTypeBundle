@@ -228,7 +228,7 @@ class Import extends ContainerAware
         return $structure;
     }
 
-    public function hydrateField($fieldStructure, $fieldData)
+    public function hydrateField($fieldDraft, $fieldStructure, $fieldData)
     {
         $fields = array(
             'position',
@@ -240,7 +240,7 @@ class Import extends ContainerAware
         foreach ( $fields as $field )
         {
             $event = new FieldAttributeEvent();
-            $event->setOldValue( $fieldStructure->$field );
+            $event->setOldValue( $fieldDraft->$field );
             $event->setAttributeName( $field );
             if ( isset( $fieldData[$field] ) )
             {

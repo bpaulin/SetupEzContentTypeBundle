@@ -137,7 +137,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
                         $typeDraft
                     );
                     $fieldStructure = $importService->getFieldStructure( $fieldDraft, $fieldName, $fieldData['type'] );
-                    $importService->hydrateField( $fieldStructure, $fieldData );
+                    $importService->hydrateField( $fieldDraft, $fieldStructure, $fieldData );
                     $importService->addFieldToType(
                         $fieldDraft,
                         $fieldStructure,
@@ -199,6 +199,6 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
 
     public function afterFieldAttributeLoading(FieldAttributeEvent $event)
     {
-        $this->output->writeln( '    field attribute: '.$event->getAttributeName().' '.$event->getOldValue().'->'.$event->getNewValue() );
+        $this->output->writeln( '      field attribute: '.$event->getAttributeName().' '.$event->getOldValue().' -> '.$event->getNewValue() );
     }
 }
