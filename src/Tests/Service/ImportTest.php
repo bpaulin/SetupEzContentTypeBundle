@@ -3,6 +3,7 @@
 namespace Bpaulin\SetupEzContentTypeBundle\Tests\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\ImportEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use Bpaulin\SetupEzContentTypeBundle\Service\Import;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroupCreateStruct;
@@ -86,8 +87,8 @@ class ImportTest extends \PHPUnit_Framework_TestCase
         $this->contentTypeService->expects( $this->never() )
             ->method( 'createContentTypeGroup' );;
 
-        $event = new GroupLoadingEvent();
-        $event->setGroupName( 'sdf' );
+        $event = new ImportEvent();
+        $event->setName( 'sdf' );
         $event->setStatus( Events::STATUS_MISSING );
 
         $this->dispatcher->expects( $this->once() )
@@ -126,10 +127,10 @@ class ImportTest extends \PHPUnit_Framework_TestCase
                 $this->returnValue( $sdfGroup )
             );
 
-        $event = new GroupLoadingEvent();
-        $event->setGroupName( 'sdf' );
+        $event = new ImportEvent();
+        $event->setName( 'sdf' );
         $event->setStatus( Events::STATUS_CREATED );
-        $event->setGroup( $sdfGroup );
+        $event->setObject( $sdfGroup );
 
         $this->dispatcher->expects( $this->once() )
             ->method( 'dispatch' )
@@ -144,10 +145,10 @@ class ImportTest extends \PHPUnit_Framework_TestCase
 
     public function testGetOldGroup()
     {
-        $event = new GroupLoadingEvent();
-        $event->setGroupName( 'sdf' );
+        $event = new ImportEvent();
+        $event->setName( 'sdf' );
         $event->setStatus( Events::STATUS_LOADED );
-        $event->setGroup( 'sdfGroup' );
+        $event->setObject( 'sdfGroup' );
 
         $this->dispatcher->expects( $this->once() )
             ->method( 'dispatch' )

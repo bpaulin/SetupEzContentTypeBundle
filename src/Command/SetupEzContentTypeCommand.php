@@ -2,12 +2,7 @@
 namespace Bpaulin\SetupEzContentTypeBundle\Command;
 
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldAttributeEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\TypeLoadingEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\ImportEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputOption;
@@ -190,7 +185,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
      *
      * @param GroupLoadingEvent $event
      */
-    public function afterGroupLoading(GroupLoadingEvent $event)
+    public function afterGroupLoading(ImportEvent $event)
     {
         if ( $this->output->isVerbose() )
         {
@@ -204,11 +199,11 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( 'group '.$event->getGroupName().' '.$status );
+            $this->output->writeln( 'group '.$event->getName().' '.$status );
         }
     }
 
-    public function afterTypeLoading(TypeLoadingEvent $event)
+    public function afterTypeLoading(ImportEvent $event)
     {
         if ( $this->output->isVerbose() )
         {
@@ -222,11 +217,11 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( '  type '.$event->getTypeName().' '.$status );
+            $this->output->writeln( '  type '.$event->getName().' '.$status );
         }
     }
 
-    public function afterTypeDraftLoading(TypeDraftEvent $event)
+    public function afterTypeDraftLoading(ImportEvent $event)
     {
         if ( $this->output->isVeryVerbose() )
         {
@@ -240,11 +235,11 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( '  type draft '.$event->getTypeName().' '.$status );
+            $this->output->writeln( '  type draft '.$event->getName().' '.$status );
         }
     }
 
-    public function afterFieldDraftLoading(FieldDraftEvent $event)
+    public function afterFieldDraftLoading(ImportEvent $event)
     {
         if ( $this->output->isVerbose() )
         {
@@ -258,11 +253,11 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( '    field '.$event->getFieldName().' '.$status );
+            $this->output->writeln( '    field '.$event->getName().' '.$status );
         }
     }
 
-    public function afterTypeStructureLoading(TypeStructureEvent $event)
+    public function afterTypeStructureLoading(ImportEvent $event)
     {
         if ( $this->output->isVeryVerbose() )
         {
@@ -270,7 +265,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         }
     }
 
-    public function afterFieldStructureLoading(FieldStructureEvent $event)
+    public function afterFieldStructureLoading(ImportEvent $event)
     {
         if ( $this->output->isVeryVerbose() )
         {
@@ -282,7 +277,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     {
         if ( $this->output->isVeryVerbose() || ( $this->output->isVerbose() && $event->getOldValue() != $event->getNewValue() ) )
         {
-            $this->output->writeln( '      attribute '.$event->getAttributeName().' '.$event->getOldValue().' -> <comment>'.$event->getNewValue().'</comment>' );
+            $this->output->writeln( '      attribute '.$event->getName().' '.$event->getOldValue().' -> <comment>'.$event->getNewValue().'</comment>' );
         }
     }
 }

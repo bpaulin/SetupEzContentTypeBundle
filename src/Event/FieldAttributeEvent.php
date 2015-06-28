@@ -8,27 +8,10 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Event;
 
-class FieldAttributeEvent extends AbstractEvent
+class FieldAttributeEvent extends ImportEvent
 {
     protected $oldValue;
     protected $newValue;
-    protected $attributeName;
-
-    /**
-     * @return mixed
-     */
-    public function getAttributeName()
-    {
-        return $this->attributeName;
-    }
-
-    /**
-     * @param mixed $attributeName
-     */
-    public function setAttributeName($attributeName)
-    {
-        $this->attributeName = $attributeName;
-    }
 
     /**
      * @return mixed

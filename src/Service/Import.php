@@ -2,12 +2,7 @@
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldAttributeEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\FieldDraftEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\FieldStructureEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\GroupLoadingEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\TypeDraftEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\TypeLoadingEvent;
-use Bpaulin\SetupEzContentTypeBundle\Event\TypeStructureEvent;
+use Bpaulin\SetupEzContentTypeBundle\Event\ImportEvent;
 use Bpaulin\SetupEzContentTypeBundle\Events;
 use eZ\Publish\SPI\Persistence\Content\Type\Group;
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -81,8 +76,8 @@ class Import extends ContainerAware
 
     public function getGroupDraft( $groupName )
     {
-        $event = new GroupLoadingEvent();
-        $event->setGroupName( $groupName )
+        $event = new ImportEvent();
+        $event->setName( $groupName )
             ->setStatus( Events::STATUS_MISSING );
 
         $contentTypeGroup = false;
@@ -101,7 +96,7 @@ class Import extends ContainerAware
                 $event->setStatus( Events::STATUS_CREATED );
             }
         }
-        $event->setGroup( $contentTypeGroup );
+        $event->setObject( $contentTypeGroup );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_GROUP_LOADING, $event
@@ -111,8 +106,8 @@ class Import extends ContainerAware
 
     public function getType ( $typeName )
     {
-        $event = new TypeLoadingEvent();
-        $event->setTypeName( $typeName )
+        $event = new ImportEvent();
+        $event->setName( $typeName )
             ->setStatus( Events::STATUS_MISSING );
         try
         {
@@ -123,7 +118,7 @@ class Import extends ContainerAware
         {
             $contentType = false;
         }
-        $event->setType( $contentType );
+        $event->setObject( $contentType );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_TYPE_LOADING, $event
@@ -133,8 +128,8 @@ class Import extends ContainerAware
 
     public function getTypeDraft ( $typeName, $contentType )
     {
-        $event = new TypeDraftEvent();
-        $event->setTypeName( $typeName )
+        $event = new ImportEvent();
+        $event->setName( $typeName )
             ->setStatus( Events::STATUS_MISSING );
         $contentTypeDraft = false;
         if ( $contentType )
@@ -150,7 +145,7 @@ class Import extends ContainerAware
                 $event->setStatus( Events::STATUS_LOADED );
             }
         }
-        $event->setTypeDraft( $contentTypeDraft );
+        $event->setObject( $contentTypeDraft );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_TYPE_DRAFT_LOADING, $event
@@ -160,14 +155,14 @@ class Import extends ContainerAware
 
     public function getTypeStructure( $typeDraft, $typeName )
     {
-        $event = new TypeStructureEvent();
+        $event = new ImportEvent();
 
         $structure = ( $typeDraft ) ?
             $this->getContentTypeService()->newContentTypeUpdateStruct():
             $this->getContentTypeService()->newContentTypeCreateStruct( $typeName );
         $event->setStatus( ( $typeDraft ) ?  Events::STATUS_UPDATE_STRUCTURE : Events::STATUS_CREATE_STRUCTURE );
 
-        $event->setTypeStructure( $structure );
+        $event->setObject( $structure );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_TYPE_STRUCTURE_LOADING, $event
@@ -209,8 +204,8 @@ class Import extends ContainerAware
      */
     public function getFieldDraft($fieldName, $typeDraft)
     {
-        $event = new FieldDraftEvent();
-        $event->setFieldName( $fieldName );
+        $event = new ImportEvent();
+        $event->setName( $fieldName );
 
         $fieldDraft = null;
         $event->setStatus( Events::STATUS_MISSING );
@@ -220,7 +215,7 @@ class Import extends ContainerAware
             $event->setStatus( Events::STATUS_LOADED );
         }
 
-        $event->setFieldDraft( $fieldDraft );
+        $event->setObject( $fieldDraft );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_FIELD_DRAFT_LOADING, $event
@@ -231,14 +226,14 @@ class Import extends ContainerAware
 
     public function getFieldStructure( $fieldDraft, $fieldName, $fieldType )
     {
-        $event = new FieldStructureEvent();
+        $event = new ImportEvent();
 
         $structure = ( $fieldDraft ) ?
             $this->getContentTypeService()->newFieldDefinitionUpdateStruct():
             $this->getContentTypeService()->newFieldDefinitionCreateStruct( $fieldName, $fieldType );
         $event->setStatus( ( $fieldDraft ) ?  Events::STATUS_UPDATE_STRUCTURE : Events::STATUS_CREATE_STRUCTURE );
 
-        $event->setFieldStructure( $structure );
+        $event->setObject( $structure );
 
         $this->getEventDispatcher()->dispatch(
             Events::AFTER_FIELD_STRUCTURE_LOADING, $event
@@ -260,7 +255,7 @@ class Import extends ContainerAware
         {
             $event = new FieldAttributeEvent();
             $event->setOldValue( $fieldDraft->$field );
-            $event->setAttributeName( $field );
+            $event->setName( $field );
             if ( isset( $fieldData[$field] ) )
             {
                 $fieldStructure->$field = $fieldData[$field];
