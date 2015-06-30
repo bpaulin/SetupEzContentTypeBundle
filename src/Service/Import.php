@@ -74,7 +74,7 @@ class Import extends ContainerAware
         return $this->force;
     }
 
-    public function getGroupDraft( $groupName )
+    public function getGroup( $groupName )
     {
         $event = new ImportEvent();
         $event->setName( $groupName )
@@ -136,13 +136,16 @@ class Import extends ContainerAware
         {
             try
             {
-                $contentTypeDraft = $this->getContentTypeService()->createContentTypeDraft( $contentType );
-                $event->setStatus( Events::STATUS_CREATED );
-            }
-            catch ( \eZ\Publish\Core\Base\Exceptions\BadStateException $e)
-            {
                 $contentTypeDraft = $this->getContentTypeService()->loadContentTypeDraft( $contentType->id );
                 $event->setStatus( Events::STATUS_LOADED );
+            }
+            catch ( \eZ\Publish\Core\Base\Exceptions\NotFoundException $e)
+            {
+                if ( $this->isForce() )
+                {
+                    $contentTypeDraft = $this->getContentTypeService()->createContentTypeDraft( $contentType );
+                    $event->setStatus( Events::STATUS_CREATED );
+                }
             }
         }
         $event->setObject( $contentTypeDraft );
@@ -285,6 +288,11 @@ class Import extends ContainerAware
 
     public function addFieldToType($fieldDraft, $fieldStructure, $typeDraft, $typeStructure)
     {
+        if ( !$this->isForce() )
+        {
+            return false;
+        }
+
         if ( $typeDraft )
         {
             return $this->getContentTypeService()->updateFieldDefinition(
@@ -299,6 +307,11 @@ class Import extends ContainerAware
 
     public function addTypeToGroup( $typeDraft, $typeStructure, $groupDraft )
     {
+        if ( !$this->isForce() )
+        {
+            return false;
+        }
+
         if ( $typeDraft )
         {
             $this->getContentTypeService()->updateContentTypeDraft( $typeDraft, $typeStructure );

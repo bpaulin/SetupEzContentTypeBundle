@@ -125,7 +125,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         $importService->setForce( $this->input->getOption( 'force' ) );
         foreach ( $tree as $groupName => $groupData )
         {
-            $groupDraft = $importService->getGroupDraft( $groupName );
+            $groupDraft = $importService->getGroup( $groupName );
             foreach ( $groupData as $typeName => $typeData )
             {
                 $type = $importService->getType( $typeName );

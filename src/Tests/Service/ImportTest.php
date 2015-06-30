@@ -97,7 +97,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             false,
-            $this->import->getGroupDraft( 'sdf' )
+            $this->import->getGroup( 'sdf' )
         );
     }
 
@@ -139,7 +139,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
         $this->import->setForce( true );
         $this->assertEquals(
             $sdfGroup,
-            $this->import->getGroupDraft( 'sdf' )
+            $this->import->getGroup( 'sdf' )
         );
     }
 
@@ -163,7 +163,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             'sdfGroup',
-            $this->import->getGroupDraft( 'sdf' )
+            $this->import->getGroup( 'sdf' )
         );
     }
 }
