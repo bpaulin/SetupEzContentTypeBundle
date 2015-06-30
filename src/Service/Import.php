@@ -1,4 +1,7 @@
 <?php
+/**
+ * Import Service
+ */
 namespace Bpaulin\SetupEzContentTypeBundle\Service;
 
 use Bpaulin\SetupEzContentTypeBundle\Event\FieldAttributeEvent;
@@ -33,6 +36,8 @@ class Import extends ContainerAware
     protected $eventDispatcher;
 
     /**
+     * Return EzPublish ContentService
+     *
      * @return \eZ\Publish\API\Repository\ContentTypeService
      */
     protected function getContentTypeService()
@@ -45,6 +50,8 @@ class Import extends ContainerAware
     }
 
     /**
+     * Return Symfony Event Dispatcher
+     *
      * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher|\Symfony\Component\EventDispatcher\EventDispatcher
      */
     protected function getEventDispatcher()
@@ -57,7 +64,9 @@ class Import extends ContainerAware
     }
 
     /**
-     * @param $force
+     * Set Force mode
+     *
+     * @param $force boolean
      * @return $this
      */
     public function setForce( $force )
@@ -74,6 +83,14 @@ class Import extends ContainerAware
         return $this->force;
     }
 
+    /**
+     * Return group identified by groupName
+     *
+     * Create the group if force is enabled
+     *
+     * @param $groupName string
+     * @return bool|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup
+     */
     public function getGroup( $groupName )
     {
         $event = new ImportEvent();
@@ -104,6 +121,14 @@ class Import extends ContainerAware
         return $contentTypeGroup;
     }
 
+    /**
+     * Return type identified by typeName
+     *
+     * Create the type if force is enabled
+     *
+     * @param $typeName string
+     * @return bool|\eZ\Publish\API\Repository\Values\ContentType\ContentType
+     */
     public function getType ( $typeName )
     {
         $event = new ImportEvent();
@@ -126,6 +151,15 @@ class Import extends ContainerAware
         return $contentType;
     }
 
+    /**
+     * Return type draft for contentType
+     *
+     * Create the group if force is enabled
+     *
+     * @param $typeName string
+     * @param $contentType bool|\eZ\Publish\API\Repository\Values\ContentType\ContentType
+     * @return bool|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
+     */
     public function getTypeDraft ( $typeName, $contentType )
     {
         $event = new ImportEvent();
@@ -156,6 +190,11 @@ class Import extends ContainerAware
         return $contentTypeDraft;
     }
 
+    /**
+     * @param $typeDraft bool|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
+     * @param $typeName
+     * @return \eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct
+     */
     public function getTypeStructure( $typeDraft, $typeName )
     {
         $event = new ImportEvent();
@@ -173,6 +212,10 @@ class Import extends ContainerAware
         return $structure;
     }
 
+    /**
+     * @param $typeStructure \eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct
+     * @param $typeData
+     */
     public function hydrateType($typeStructure, $typeData)
     {
         // type data
@@ -201,16 +244,15 @@ class Import extends ContainerAware
 
     /**
      * @param $fieldName
-     * @param $fieldType
      * @param $typeDraft \eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
-     * @return mixed
+     * @return bool|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition
      */
-    public function getFieldDraft($fieldName, $typeDraft)
+    public function getField($fieldName, $typeDraft)
     {
         $event = new ImportEvent();
         $event->setName( $fieldName );
 
-        $fieldDraft = null;
+        $fieldDraft = false;
         $event->setStatus( Events::STATUS_MISSING );
         if ( $typeDraft )
         {
@@ -227,6 +269,12 @@ class Import extends ContainerAware
         return $fieldDraft;
     }
 
+    /**
+     * @param $fieldDraft bool|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition
+     * @param $fieldName
+     * @param $fieldType
+     * @return \eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct
+     */
     public function getFieldStructure( $fieldDraft, $fieldName, $fieldType )
     {
         $event = new ImportEvent();
@@ -245,6 +293,11 @@ class Import extends ContainerAware
         return $structure;
     }
 
+    /**
+     * @param $fieldDraft bool|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition
+     * @param $fieldStructure \eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct
+     * @param $fieldData
+     */
     public function hydrateField($fieldDraft, $fieldStructure, $fieldData)
     {
         $fields = array(
@@ -286,6 +339,13 @@ class Import extends ContainerAware
         }
     }
 
+    /**
+     * @param $fieldDraft bool|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinition
+     * @param $fieldStructure \eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\FieldDefinitionUpdateStruct
+     * @param $typeDraft bool|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
+     * @param $typeStructure \eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct
+     * @return bool
+     */
     public function addFieldToType($fieldDraft, $fieldStructure, $typeDraft, $typeStructure)
     {
         if ( !$this->isForce() )
@@ -305,6 +365,12 @@ class Import extends ContainerAware
         return $typeStructure->addFieldDefinition( $fieldStructure );
     }
 
+    /**
+     * @param $typeDraft bool|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeDraft
+     * @param $typeStructure \eZ\Publish\API\Repository\Values\ContentType\ContentTypeCreateStruct|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeUpdateStruct
+     * @param $groupDraft bool|\eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup
+     * @return bool
+     */
     public function addTypeToGroup( $typeDraft, $typeStructure, $groupDraft )
     {
         if ( !$this->isForce() )

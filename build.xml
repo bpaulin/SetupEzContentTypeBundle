@@ -27,7 +27,7 @@
         <exec executable="./bin/phpmd" passthru="true" checkreturn="true">
             <arg path="src"/>
             <arg value="text"/>
-            <arg value="cleancode,codesize,controversial,design,naming,unusedcode"/>
+            <arg value="phpmd_rules.xml"/>
         </exec>
     </target>
 

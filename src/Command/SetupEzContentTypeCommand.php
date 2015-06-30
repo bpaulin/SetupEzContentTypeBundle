@@ -135,7 +135,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
 
                 foreach ( $typeData['fields'] as $fieldName => $fieldData )
                 {
-                    $fieldDraft = $importService->getFieldDraft(
+                    $fieldDraft = $importService->getField(
                         $fieldName,
                         $typeDraft
                     );
