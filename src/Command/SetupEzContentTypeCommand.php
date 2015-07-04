@@ -111,18 +111,18 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
 
     protected function runImport()
     {
-        $treeProcessor = $this->getContainer()->get( 'bpaulin.setupezcontenttype.treeprocessor' );
-        $tree = $treeProcessor->getTree();
+        $tree = $this->getContainer()->getParameter( 'bpaulin_setup_ez_content_type.groups' );
+        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
+        $importService->setForce( $this->input->getOption( 'force' ) );
+        $importService->setTree( $tree );
         if ( !$this->output->isVerbose() )
         {
             $progress = $this->getHelperSet()->get( 'progress' );
-            $progress->start( $this->output, $treeProcessor->countTypes() );
+            $progress->start( $this->output, $importService->countTypes() );
         }
         /*
          * and finally, at least, do something
          */
-        $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
-        $importService->setForce( $this->input->getOption( 'force' ) );
         foreach ( $tree as $groupName => $groupData )
         {
             $groupDraft = $importService->getGroup( $groupName );

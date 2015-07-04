@@ -44,7 +44,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
 
         $this->repository = $this->getMockBuilder( 'eZ\Publish\API\Repository\Repository' )
             ->getMock();
-        $this->repository->expects( $this->once() )
+        $this->repository->expects( $this->any() )
             ->method( 'getContentTypeService' )
             ->will(
                 $this->returnValue(
@@ -57,7 +57,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
 
         $this->container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
-        $this->container->expects( $this->exactly( 2 ) )
+        $this->container->expects( $this->any() )
             ->method( 'get' )
             ->withConsecutive(
                 array( 'ezpublish.api.repository' ),
@@ -164,6 +164,19 @@ class ImportTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'sdfGroup',
             $this->import->getGroup( 'sdf' )
+        );
+    }
+
+    public function testTree()
+    {
+        $import = new Import();
+        $this->assertSame(
+            $import,
+            $import->setTree( 'foo' )
+        );
+        $this->assertSame(
+            'foo',
+            $import->getTree()
         );
     }
 }

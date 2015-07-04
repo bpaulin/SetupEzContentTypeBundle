@@ -104,14 +104,6 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $treeProcessor = $this->getMockBuilder( 'Bpaulin\SetupEzContentTypeBundle\Service\TreeProcessor' )
-            ->getMock();
-        $treeProcessor->expects( $this->once() )
-            ->method( 'getTree' )
-            ->will(
-                $this->returnValue( $tree )
-            );
-
         $import = $this->getMockBuilder( 'Bpaulin\SetupEzContentTypeBundle\Service\Import' )
             ->getMock();
         $import->expects( $this->once() )
@@ -152,22 +144,24 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->getMockBuilder( 'Symfony\Component\DependencyInjection\Container' )
             ->getMock();
-        $container->expects( $this->exactly( 4 ) )
+        $container->expects( $this->exactly( 3 ) )
             ->method( 'get' )
             ->withConsecutive(
                 array( 'ezpublish.api.repository' ),
                 array( 'event_dispatcher' ),
-                array( 'bpaulin.setupezcontenttype.treeprocessor' ),
                 array( 'bpaulin.setupezcontenttype.import' )
             )
             ->will(
                 $this->onConsecutiveCalls(
                     $repository,
                     $dispatcher,
-                    $treeProcessor,
                     $import
                 )
             );
+        $container->expects( $this->any() )
+            ->method( 'getParameter' )
+            ->with( 'bpaulin_setup_ez_content_type.groups' )
+            ->will( $this->returnValue( $tree ) );
         $this->command->setContainer( $container );
         $this->tester->execute(
             array(

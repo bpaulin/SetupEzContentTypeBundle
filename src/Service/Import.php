@@ -25,6 +25,25 @@ class Import extends ContainerAware
      */
     protected $force;
 
+    protected $tree;
+
+    /**
+     * @return mixed
+     */
+    public function getTree()
+    {
+        return $this->tree;
+    }
+
+    /**
+     * @param mixed $tree
+     */
+    public function setTree($tree)
+    {
+        $this->tree = $tree;
+        return $this;
+    }
+
     /**
      * @var \eZ\Publish\API\Repository\ContentTypeService
      */
@@ -391,5 +410,15 @@ class Import extends ContainerAware
         return $this->getContentTypeService()->publishContentTypeDraft( $typeDraft );
     }
 
+    public function countTypes()
+    {
+        $groups = $this->tree;
+        $count = 0;
+        foreach ( $groups as $group )
+        {
+            $count += count( $group );
+        }
+        return $count;
+    }
 }
 

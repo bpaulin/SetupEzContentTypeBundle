@@ -4,11 +4,11 @@ bpaulin_setup_ez_content_type:
         group1:
             bpaulin_min:
                 extends: group2.bpaulin_virtual
-                mainLanguageCode: 'eng-GB'
+                mainLanguageCode: 'eng_GB'
                 names:
                     eng-GB: 'bpaulin_min'
             bpaulin_all:
-                mainLanguageCode: 'eng-GB'
+                mainLanguageCode: 'eng_GB'
                 nameSchema: '<name>'
                 names:
                     eng-GB: 'bpaulin_alll'
@@ -33,7 +33,7 @@ bpaulin_setup_ez_content_type:
         group2:
             bpaulin_virtual:
 #                extends: group1.bpaulin_all
-                mainLanguageCode: 'eng-GB'
+                mainLanguageCode: 'eng_GB'
                 virtual: true
                 descriptions:
                     eng-GB: 'My content virtual'
@@ -45,7 +45,7 @@ bpaulin_setup_ez_content_type:
         group3:
             bpaulin_another:
                 extends: group1.bpaulin_min
-                mainLanguageCode: 'eng-GB'
+                mainLanguageCode: 'eng_GB'
                 names:
                     eng-GB: 'bpaulin_another'
                     eng-GB: 'bpaulin_another'
