@@ -199,7 +199,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( 'group '.$event->getName().' '.$status );
+            $this->output->writeln( 'group '.$event->getObjectName().' '.$status );
         }
     }
 
@@ -217,7 +217,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( '  type '.$event->getName().' '.$status );
+            $this->output->writeln( '  type '.$event->getObjectName().' '.$status );
         }
     }
 
@@ -235,7 +235,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( '  type draft '.$event->getName().' '.$status );
+            $this->output->writeln( '  type draft '.$event->getObjectName().' '.$status );
         }
     }
 
@@ -253,7 +253,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
             {
                 $status = '<'.$markMatches[$status].">$status</".$markMatches[$status].'>';
             }
-            $this->output->writeln( '    field '.$event->getName().' '.$status );
+            $this->output->writeln( '    field '.$event->getObjectName().' '.$status );
         }
     }
 
@@ -277,7 +277,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     {
         if ( $this->output->isVeryVerbose() || ( $this->output->isVerbose() && $event->getOldValue() != $event->getNewValue() ) )
         {
-            $this->output->writeln( '      attribute '.$event->getName().' '.$event->getOldValue().' -> <comment>'.$event->getNewValue().'</comment>' );
+            $this->output->writeln( '      attribute '.$event->getObjectName().' '.$event->getOldValue().' -> <comment>'.$event->getNewValue().'</comment>' );
         }
     }
 }

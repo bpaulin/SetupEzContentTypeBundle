@@ -6,23 +6,23 @@ use Symfony\Component\EventDispatcher\Event;
 class ImportEvent extends Event
 {
     protected $status = null;
-    protected $name = null;
+    protected $objectName = null;
     protected $object = null;
 
     /**
      * @return null
      */
-    public function getName()
+    public function getObjectName()
     {
-        return $this->name;
+        return $this->objectName;
     }
 
     /**
      * @param null $name
      */
-    public function setName($name)
+    public function setObjectName($objectName)
     {
-        $this->name = $name;
+        $this->objectName = $objectName;
         return $this;
     }
 

@@ -88,7 +88,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
             ->method( 'createContentTypeGroup' );;
 
         $event = new ImportEvent();
-        $event->setName( 'sdf' );
+        $event->setObjectName( 'sdf' );
         $event->setStatus( Events::STATUS_MISSING );
 
         $this->dispatcher->expects( $this->once() )
@@ -128,7 +128,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
             );
 
         $event = new ImportEvent();
-        $event->setName( 'sdf' );
+        $event->setObjectName( 'sdf' );
         $event->setStatus( Events::STATUS_CREATED );
         $event->setObject( $sdfGroup );
 
@@ -146,7 +146,7 @@ class ImportTest extends \PHPUnit_Framework_TestCase
     public function testGetOldGroup()
     {
         $event = new ImportEvent();
-        $event->setName( 'sdf' );
+        $event->setObjectName( 'sdf' );
         $event->setStatus( Events::STATUS_LOADED );
         $event->setObject( 'sdfGroup' );
 

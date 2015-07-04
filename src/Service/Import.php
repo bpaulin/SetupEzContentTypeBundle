@@ -94,7 +94,7 @@ class Import extends ContainerAware
     public function getGroup( $groupName )
     {
         $event = new ImportEvent();
-        $event->setName( $groupName )
+        $event->setObjectName( $groupName )
             ->setStatus( Events::STATUS_MISSING );
 
         $contentTypeGroup = false;
@@ -132,7 +132,7 @@ class Import extends ContainerAware
     public function getType ( $typeName )
     {
         $event = new ImportEvent();
-        $event->setName( $typeName )
+        $event->setObjectName( $typeName )
             ->setStatus( Events::STATUS_MISSING );
         try
         {
@@ -163,7 +163,7 @@ class Import extends ContainerAware
     public function getTypeDraft ( $typeName, $contentType )
     {
         $event = new ImportEvent();
-        $event->setName( $typeName )
+        $event->setObjectName( $typeName )
             ->setStatus( Events::STATUS_MISSING );
         $contentTypeDraft = false;
         if ( $contentType )
@@ -250,7 +250,7 @@ class Import extends ContainerAware
     public function getField($fieldName, $typeDraft)
     {
         $event = new ImportEvent();
-        $event->setName( $fieldName );
+        $event->setObjectName( $fieldName );
 
         $fieldDraft = false;
         $event->setStatus( Events::STATUS_MISSING );
@@ -310,8 +310,8 @@ class Import extends ContainerAware
         foreach ( $fields as $field )
         {
             $event = new FieldAttributeEvent();
-            $event->setOldValue( $fieldDraft->$field );
-            $event->setName( $field );
+            $event->setOldValue( ( $fieldDraft )? $fieldDraft->$field: null );
+            $event->setObjectName( $field );
             if ( isset( $fieldData[$field] ) )
             {
                 $fieldStructure->$field = $fieldData[$field];

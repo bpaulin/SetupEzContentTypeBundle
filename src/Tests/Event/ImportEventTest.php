@@ -6,16 +6,16 @@ use Bpaulin\SetupEzContentTypeBundle\Event\ImportEvent;
 
 class ImportEventTest extends \PHPUnit_Framework_TestCase
 {
-    public function testName()
+    public function testObjectName()
     {
         $event = new ImportEvent();
         $this->assertSame(
             $event,
-            $event->setName( 'foo' )
+            $event->setObjectName( 'foo' )
         );
         $this->assertSame(
             'foo',
-            $event->getName()
+            $event->getObjectName()
         );
     }
 
