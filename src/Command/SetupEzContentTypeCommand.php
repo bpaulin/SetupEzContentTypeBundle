@@ -32,6 +32,22 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     protected $input;
 
     /**
+     * @param \Symfony\Component\Console\Output\ConsoleOutput $output
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Input\ArgvInput $input
+     */
+    public function setInput($input)
+    {
+        $this->input = $input;
+    }
+
+    /**
      * Configures the command.
      */
     protected function configure()
@@ -66,8 +82,8 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         /*
          * store properties
          */
-        $this->input = $input;
-        $this->output = $output;
+        $this->SetInput( $input );
+        $this->SetOutput( $output );
 
         /*
          * check command input
@@ -99,6 +115,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         /*
          * set user admin
          */
+        /** @var \eZ\Publish\Core\Repository\UserService $userService */
         $userService = $repository->getUserService();
         $repository->setCurrentUser( $userService->loadUserByLogin( 'admin' ) );
 
@@ -115,9 +132,10 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
         $importService = $this->getContainer()->get( 'bpaulin.setupezcontenttype.import' );
         $importService->setForce( $this->input->getOption( 'force' ) );
         $importService->setTree( $tree );
+        /** @var \Symfony\Component\Console\Helper\ProgressBar $progress */
+        $progress = $this->getHelperSet()->get( 'progress' );
         if ( !$this->output->isVerbose() )
         {
-            $progress = $this->getHelperSet()->get( 'progress' );
             $progress->start( $this->output, $importService->countTypes() );
         }
         /*
@@ -183,7 +201,7 @@ class SetupEzContentTypeCommand extends ContainerAwareCommand
     /**
      * This is executed after a group is loaded
      *
-     * @param GroupLoadingEvent $event
+     * @param ImportEvent $event
      */
     public function afterGroupLoading(ImportEvent $event)
     {

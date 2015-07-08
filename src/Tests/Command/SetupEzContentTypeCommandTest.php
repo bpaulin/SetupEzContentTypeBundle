@@ -2,12 +2,12 @@
 
 namespace Bpaulin\SetupEzContentTypeBundle\Tests\Command;
 
-use eZ\Publish\Core\Repository\UserService;
+use Bpaulin\SetupEzContentTypeBundle\Event\ImportEvent;
+use Bpaulin\SetupEzContentTypeBundle\Events;
 use Symfony\Component\Console\Application;
 use Bpaulin\SetupEzContentTypeBundle\Command\SetupEzContentTypeCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use eZ\Publish\Core\Repository\Values\User\User;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -99,7 +99,15 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
         $tree = array(
             "group1" => array(
                 "type1" => array(
-                    "fields" => array()
+                    'mainLanguageCode' => 'eng-GB',
+                    'names' => array(
+                        'eng-GB' => 'name'
+                    ),
+                    'fields' => array(
+                        'name' => array(
+                            'type' => 'ezstring'
+                        ),
+                    )
                 )
             )
         );
@@ -174,5 +182,37 @@ class SetupEzContentTypeCommandTest extends \PHPUnit_Framework_TestCase
             $display,
             $this->tester->getDisplay()
         );
+    }
+
+    public function testAfterGroupLoadingVerbose()
+    {
+        $command = new SetupEzContentTypeCommand();
+        $event = new ImportEvent();
+        $event->setObjectName( 'groupname' )->setStatus( Events::STATUS_CREATED );
+        $output = $this->getMockBuilder( '\Symfony\Component\Console\Output\ConsoleOutput' )->getMock();
+        $output->expects( $this->once() )
+            ->method( 'isVerbose' )
+            ->will( $this->returnValue( true ) );
+        $output->expects( $this->once() )
+            ->method( 'writeln' );
+        $command->setOutput( $output );
+
+        $command->afterGroupLoading( $event );
+    }
+
+    public function testAfterGroupLoadingNotVerbose()
+    {
+        $command = new SetupEzContentTypeCommand();
+        $event = new ImportEvent();
+        $event->setObjectName( 'groupname' )->setStatus( Events::STATUS_CREATED );
+        $output = $this->getMockBuilder( '\Symfony\Component\Console\Output\ConsoleOutput' )->getMock();
+        $output->expects( $this->once() )
+            ->method( 'isVerbose' )
+            ->will( $this->returnValue( false ) );
+        $output->expects( $this->never() )
+            ->method( 'writeln' );
+        $command->setOutput( $output );
+
+        $command->afterGroupLoading( $event );
     }
 }
