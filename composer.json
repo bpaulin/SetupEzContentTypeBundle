@@ -27,6 +27,7 @@
         "phpdocumentor/phpdocumentor": "^2.8",
         "phploc/phploc": "^2.1",
         "phpmd/phpmd": "^2.2",
-        "sebastian/phpcpd": "^2.0"
+        "sebastian/phpcpd": "^2.0",
+        "codeclimate/php-test-reporter": "dev-master"
     }
 }

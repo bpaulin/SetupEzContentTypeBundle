@@ -3,9 +3,16 @@
 <project name="puzzle" default="ci">
 
     <target name="ci" depends="phpunit,phpcs,phpcpd,phpmd"/>
+    <target name="travis" depends="phpunit:clover,phpcs,phpcpd,phpmd"/>
 
     <target name="phpunit">
         <exec executable="./bin/phpunit" passthru="true" checkreturn="true">
+        </exec>
+    </target>
+
+    <target name="phpunit:clover">
+        <exec executable="./bin/phpunit" passthru="true" checkreturn="true">
+            <arg value="--coverage-clover=build/logs/clover.xml"/>
         </exec>
     </target>
 
@@ -34,24 +41,24 @@
     <target name="report" depends="clean, phpdoc, phploc, coverage"/>
 
     <target name="clean">
-        <delete dir="build"/>
+        <delete dir="report"/>
     </target>
 
     <target name="phploc">
-        <exec command="./bin/phploc src/ > build/phploc.txt"/>
+        <exec command="./bin/phploc src/ > report/phploc.txt"/>
     </target>
 
     <target name="phpdoc">
         <exec executable="./bin/phpdoc" passthru="true" checkreturn="true">
             <arg value="--directory=src"/>
-            <arg value="--target=build/phpdoc"/>
+            <arg value="--target=report/phpdoc"/>
             <arg value="--template=responsive-twig"/>
         </exec>
     </target>
 
     <target name="coverage">
         <exec executable="./bin/phpunit" passthru="true" checkreturn="true">
-            <arg value="--coverage-html=build/coverage"/>
+            <arg value="--coverage-html=report/coverage"/>
         </exec>
     </target>
 </project>

@@ -4,6 +4,12 @@ php:
   - 5.4
   - 5.5
 
+addons:
+  code_climate:
+    repo_token:
+      secure: "aDUw7IVIRcurm4BfoL98DY61pDthxdnnDKbdUbJ1f36cUHj2p2ncRYrJksJOs6MPQn682qyYBbZqvVVZCxau+UWFiyLfAqJFuQHBAiWVSbZYUgjJKuhY7yHi7o+GZNWDbRuOMJS7wrVdEeK3wqbz7R3bMjAJMyoxAWv8cUjzmItxVBrthbXm4GoD0tuLAztyfrJiIoudLj0uPyq7gGfWNc7SYaEq2PGTEZBmg7p2jrQjtFKAeywS5KzEnXSV16Eagl1p8VnRhYtSlUvzZqLb3joEZvpb6txrSyBUFF+h9IGSfxRU3bVoBTThTjUxwyDlJJla0mJHlAatSNHesrnoRhFb3JR+w0tmViJkI9WCulUXcsfic59JHEGgQTxa8r7/nmf6SvhmA9RGnm+SmPtRxNqVixctW31jr61CjpPwdDBY3pGqJVnSvlks6mLsX/tTrpnhgtkYTA3409a5x1zU9RnjWMXWoP2x/BZahDtwH3aQdpN6TARoFpWVQx6UJRYY4sxX1HGrV7BGb/L0uOmD3ruw3Bpf5pft+iSjDMiwgB5WAeBMCDJgC2SwahxZHzwCAcgi6JpzAODYeWfW0SS317tIYq+5aUdIVG4Ss5gfVg3/s6r7MWhpChu1OiAYzF14WI8CIuogtjKCDzaVYSn0JgBrE50d8iS6IAFUJfl2G7c="
+
+
 before_install:
   - composer selfupdate
 
@@ -11,4 +17,7 @@ install:
   - composer install --prefer-dist --no-interaction
 
 script:
-  - ./bin/phing ci
+  - ./bin/phing travis
+
+after_script:
+  - ./bin/test-reporter
