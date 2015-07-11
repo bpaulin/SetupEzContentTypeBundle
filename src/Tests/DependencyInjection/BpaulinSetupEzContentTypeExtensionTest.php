@@ -73,6 +73,20 @@ class BpaulinSetupEzContentTypeExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testFieldFactoryServiceIsAvailable()
+    {
+        $this->loadConfig( 'sample.yml' );
+
+        $this->assertTrue(
+            $this->container->has( 'bpaulin.setupezcontenttype.field_factory' ),
+            "The field factory service isn't available"
+        );
+        $this->assertEquals(
+            get_class( $this->container->get( 'bpaulin.setupezcontenttype.field_factory' ) ),
+            'Bpaulin\SetupEzContentTypeBundle\Service\FieldFactory'
+        );
+    }
+
     public function mergeTypeProvider()
     {
         return array(
